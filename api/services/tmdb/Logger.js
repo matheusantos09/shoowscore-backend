@@ -1,5 +1,7 @@
-import Roarr from 'roarr';
+/*
+const Roarr = require('roarr');
 
-export default Roarr.child({
+module.exports = Roarr.child({
   package: 'tmdb',
 });
+*/

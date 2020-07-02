@@ -1,6 +1,6 @@
-import {Router} from 'express';
+const {Router} = require('express');
 
-const mongo = require('../mongo');
+const mongo = require('./mongo');
 const axios = require('axios');
 const TMDB = require('./services/tmdb/TMDB')
 
@@ -229,4 +229,4 @@ routes.get('/api/seasons/:parentTconst', function (req, res) {
   });
 });
 
-export default routes;
+module.exports = routes;

@@ -1,7 +1,7 @@
-import axios from 'axios';
+const axios = require('axios');
 
 const apiTmdb = axios.create({
   baseURL: 'https://api.themoviedb.org/3/',
 });
 
-export default apiTmdb;
+module.exports =  apiTmdb;

@@ -1,10 +1,10 @@
-import apiTmdb from './api';
-import Logger from './Logger';
-import {delay} from 'bluefeather';
+const apiTmdb = require('./api');
+// const Logger = require('./Logger');
+const {delay} = require('bluefeather');
 
-const log = Logger.child({
+/*const log = Logger.child({
   namespace: 'Tmdb',
-});
+});*/
 
 module.exports = class TMDB {
   apiKey;
