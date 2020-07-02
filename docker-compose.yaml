@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  data:
+    container_name: data
+    image: data
+    build:
+      context: ./
+      dockerfile: ./data/Dockerfile
+    networks:
+      - shoowscore
+    links:
+      - "mongo"
+
+  api:
+    container_name: api
+    image: api
+    build:
+      context: ./
+      dockerfile: ./api/Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - shoowscore
+    links:
+      - "mongo"
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    logging:
+      driver: none
+    networks:
+      - shoowscore
+
+  nginx:
+    container_name: nginx
+    image: nginx:mainline-alpine
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    networks:
+      - shoowscore
+
+networks:
+  shoowscore:
+    driver: bridge
