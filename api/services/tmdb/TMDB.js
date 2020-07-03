@@ -1,14 +1,9 @@
-const apiTmdb = require('./api');
-// const Logger = require('./Logger');
 const {delay} = require('bluefeather');
 
-/*const log = Logger.child({
-  namespace: 'Tmdb',
-});*/
+const apiTmdb = require('./api');
+
 
 module.exports = class TMDB {
-  apiKey;
-  language;
 
   constructor(apiKey, language = 'en') {
     this.apiKey = apiKey;
@@ -17,15 +12,17 @@ module.exports = class TMDB {
 
   async get(resource, parameters = {}) {
 
-    while (true) {
-      const response = await apiTmdb(resource, {
+    // while (true) {
+      const response = await apiTmdb.get(resource, {
         params: {
           api_key: this.apiKey,
           ...(parameters),
         }
       })
-        // .then(response => response.status)
-        .catch(err => console.warn('err', err));
+        // .then(resp => resp)
+        .catch(err => console.warn('GET API ERROR: ', err));
+
+      console.log(response)
 
       if (!String(response.status).startsWith('2')) {
         if (response.headers['x-ratelimit-remaining']) {
@@ -39,11 +36,11 @@ module.exports = class TMDB {
             // time is wrong, we don't bombard the TMDb server with requests.
             const cooldownTime = Math.max(rateLimitReset - currentTime, 30);
 
-            log.debug('reached rate limit; waiting %d seconds', cooldownTime);
+            // log.debug('reached rate limit; waiting %d seconds', cooldownTime);
 
             await delay(cooldownTime * 1000);
 
-            continue;
+            // continue;
           }
         }
 
@@ -55,6 +52,6 @@ module.exports = class TMDB {
       }
 
       return response.data
-    }
+    // }
   }
 }

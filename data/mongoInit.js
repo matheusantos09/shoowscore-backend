@@ -22,7 +22,7 @@ mongo(async client => {
     })
 
   } catch (err) {
-    console.log(err)
+    console.log('MONGO INIT ERROR: ' + err)
   }
 
   if(client) client.close();

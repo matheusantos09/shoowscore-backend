@@ -1,22 +1,36 @@
 const {Router} = require('express');
 
-const mongo = require('./mongo');
+const mongo = require('../mongo.js');
 const axios = require('axios');
 const TMDB = require('./services/tmdb/TMDB')
+
 
 const routes = new Router();
 
 routes.get('/api', function (req, res) {
-
-  const tmdb = new TMDB('aa1dfbdc71f68d0de4576cd1f8b6a8a9');
-  const responseTmdb = tmdb.get('movie/tt7286456');
-
-  console.log(responseTmdb)
-
-  //@TODO Verificar porque a Promisse está só vindo como pendente
-
   res.send("What's up my nerdz?!?")
 })
+
+routes.get('/api/:tconst', function (req, res) {
+
+  const {tconst} = req.params;
+
+  if (typeof tconst === 'undefined' || tconst === '') {
+    //@TODO Melhorar o return das respostas de erro
+
+    console.log('tconst', tconst)
+
+    return res.send('No data found')
+  }
+
+  const tmdb = new TMDB('aa1dfbdc71f68d0de4576cd1f8b6a8a9');
+
+  tmdb.get(`movie/${tconst}`).then(response => {
+    // console.log(response)
+  });
+
+  return res.send('Fim ')
+});
 
 routes.get('/api/poster/:tconst', function (req, res) {
   var url = `http://www.omdbapi.com/?apikey=${process.env.OMDB_API}&i=${req.params.tconst}`,
