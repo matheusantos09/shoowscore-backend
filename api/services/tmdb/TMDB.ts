@@ -1,26 +1,28 @@
-// const {delay} = require('bluefeather');
-
 import apiTmdb from './api';
 
 class TMDB {
-  constructor(apiKey, language = 'en') {
+
+  public apiKey: string;
+  public language: string;
+
+  constructor ( apiKey, language = 'en' ) {
     this.apiKey = apiKey;
     this.language = language;
   }
 
-  async get(resource, parameters = {}) {
+  async get ( resource, parameters = {} ) {
     // while (true) {
     // @TODO Trar melhor quando não encontrar o resultado na api do TMDB e devovler 404
     try {
       const response = await apiTmdb
-        .get(`https://api.themoviedb.org/3/${resource}`, {
+        .get(`https://api.themoviedb.org/3/${ resource }`, {
           params: {
             api_key: this.apiKey,
             ...parameters,
           },
         })
         // .then(resp => resp)
-        .catch((error) => {
+        .catch(( error ) => {
           // const errorResponse = error.response;
 
           // if (!String(errorResponse.status).startsWith('2')) {

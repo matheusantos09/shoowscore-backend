@@ -4,9 +4,9 @@ import TMDB from '../services/tmdb/TMDB';
 import TmdbCache from "../schemas/TmdbCache";
 
 class ResourceController {
-  async find (req, res) {
+  async find ( req, res ) {
     try {
-      const {tconst} = req.params;
+      const { tconst } = req.params;
 
       if (typeof tconst === 'undefined' || tconst === '') {
         // @TODO Melhorar o return das respostas de erro
@@ -32,7 +32,7 @@ class ResourceController {
         updateContent = false,
         consultInApi = false;
 
-      const findResource = await TmdbCache.findOne({tconst}, function (err, data) {
+      const findResource = await TmdbCache.findOne({ tconst }, function ( err, data ) {
 
         if (!err) {
 
@@ -69,7 +69,7 @@ class ResourceController {
 
             if (updateContent) {
 
-              TmdbCache.updateOne({_id: findResource._id}, response, function (err, raw) {
+              TmdbCache.updateOne({ _id: findResource._id }, response, function ( err, raw ) {
                 if (err) {
                   //@TODO Tratar error
                   console.log('TmdbCache.update', err)
@@ -78,7 +78,7 @@ class ResourceController {
 
             } else {
 
-              TmdbCache.create(response, function (err, data) {
+              TmdbCache.create(response, function ( err, data ) {
                 if (!err) {
                   //@TODO TUDO OK
                 } else {

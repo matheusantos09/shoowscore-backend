@@ -13,14 +13,14 @@ mongo(async client => {
       await db.createCollection("episode")
       await db.createCollection("ratings")
       await db.createCollection("basics")
-      await db.createCollection("tmdbcache")
+      await db.createCollection("tmdbcaches")
 
       //init indexing
       await db.collection("episode").createIndex({parentTconst: 1})
       await db.collection("ratings").createIndex({tconst: 1, numVotes: -1})
       await db.collection("basics").createIndex({tconst: 1})
       await db.collection("basics").createIndex({"primaryTitle": "text"})
-      await db.collection("tmdbcache").createIndex({tconst: 1})
+      await db.collection("tmdbcaches").createIndex({tconst: 1})
     });
 
   } catch (err) {

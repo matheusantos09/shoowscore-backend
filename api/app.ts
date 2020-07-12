@@ -21,7 +21,7 @@ class App {
   }
 
   apiKeyVerify () {
-    app.use(function (req, res, next) {
+    app.use(function ( req, res, next ) {
       const key = req.headers['x-api-key'];
       if (key && key === process.env.API_KEY) {
         return next();

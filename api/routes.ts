@@ -9,17 +9,17 @@ import ResourceController from "./controllers/ResourceController";
 
 const routes = new Router();
 
-routes.get('/api', function (req, res) {
+routes.get('/api', function ( req, res ) {
   res.send("What's up my nerdz?!?");
 });
 
 routes.get('/api/:tconst', ResourceController.find);
 
-routes.get('/api/poster/:tconst', function (req, res) {
+routes.get('/api/poster/:tconst', function ( req, res ) {
   const url = `http://www.omdbapi.com/?apikey=${ process.env.OMDB_API }&i=${ req.params.tconst }`;
   const placeholder = 'https://via.placeholder.com/300x450';
 
-  axios.get(url, function (error, response, body) {
+  axios.get(url, function ( error, response, body ) {
     if (!error && response.statusCode === 200) {
       const data = JSON.parse(body);
       const img = data.Poster;
@@ -32,20 +32,20 @@ routes.get('/api/poster/:tconst', function (req, res) {
   });
 });
 
-routes.get('/api/count/:type', function (req, res) {
-  mongo((client) => {
+routes.get('/api/count/:type', function ( req, res ) {
+  mongo(( client ) => {
     const db = client.db('tvratings');
     const col = db.collection(req.params.type);
-    col.countDocuments().then((data) => res.send(`${ data } records`));
+    col.countDocuments().then(( data ) => res.send(`${ data } records`));
   });
 });
 
-routes.get('/api/find/:type/:tconst', function (req, res) {
-  mongo((client) => {
+routes.get('/api/find/:type/:tconst', function ( req, res ) {
+  mongo(( client ) => {
     const db = client.db('tvratings');
     const collection = db.collection(req.params.type);
 
-    collection.findOne({tconst: req.params.tconst}).then(function (doc) {
+    collection.findOne({ tconst: req.params.tconst }).then(function ( doc ) {
       const result = !doc ? 'No record found.' : doc;
       client.close();
       res.send(result);
@@ -53,14 +53,14 @@ routes.get('/api/find/:type/:tconst', function (req, res) {
   });
 });
 
-routes.get('/api/show/:tconst', function (req, res) {
-  mongo((client) => {
+routes.get('/api/show/:tconst', function ( req, res ) {
+  mongo(( client ) => {
     const db = client.db('tvratings');
     const basics = db.collection('basics');
 
     basics
       .aggregate([
-        {$match: {tconst: req.params.tconst}},
+        { $match: { tconst: req.params.tconst } },
         // get rating
         {
           $lookup: {
@@ -70,7 +70,7 @@ routes.get('/api/show/:tconst', function (req, res) {
             as: 'rating',
           },
         },
-        {$unwind: '$rating'},
+        { $unwind: '$rating' },
         // get episodes for entire series
         {
           $lookup: {
@@ -89,12 +89,12 @@ routes.get('/api/show/:tconst', function (req, res) {
             endYear: 1,
             averageRating: '$rating.averageRating',
             numVotes: '$rating.numVotes',
-            episodeCount: {$size: '$episodes'},
+            episodeCount: { $size: '$episodes' },
           },
         },
       ])
       .toArray()
-      .then((data) => {
+      .then(( data ) => {
         const results = data || 500;
         res.send(results);
         if (client) client.close();
@@ -102,8 +102,8 @@ routes.get('/api/show/:tconst', function (req, res) {
   });
 });
 
-routes.get('/api/search/:query', function (req, res) {
-  mongo((client) => {
+routes.get('/api/search/:query', function ( req, res ) {
+  mongo(( client ) => {
     const db = client.db('tvratings');
     const basics = db.collection('basics');
     const query = decodeURIComponent(req.params.query);
@@ -113,7 +113,7 @@ routes.get('/api/search/:query', function (req, res) {
         {
           $match: {
             $and: [
-              {titleType: 'tvSeries'},
+              { titleType: 'tvSeries' },
               {
                 $text: {
                   $search: query,
@@ -122,7 +122,7 @@ routes.get('/api/search/:query', function (req, res) {
             ],
           },
         },
-        {$sort: {score: {$meta: 'textScore'}}},
+        { $sort: { score: { $meta: 'textScore' } } },
         // get episodes for entire series
         {
           $lookup: {
@@ -143,7 +143,7 @@ routes.get('/api/search/:query', function (req, res) {
         },
         // { $sort: { "rating.numVotes": -1 } },
         // { $limit: 100 },
-        {$unwind: '$rating'},
+        { $unwind: '$rating' },
         {
           $project: {
             _id: 1,
@@ -154,22 +154,22 @@ routes.get('/api/search/:query', function (req, res) {
             genres: 1,
             averageRating: '$rating.averageRating',
             numVotes: '$rating.numVotes',
-            episodeCount: {$size: '$episodes'},
+            episodeCount: { $size: '$episodes' },
           },
         },
         // only output shows that have episodes and over 500 votes
         {
           $match: {
             $and: [
-              {episodeCount: {$gt: 0}},
-              {numVotes: {$gt: 500}},
-              {primaryTitle: new RegExp(`${ query }.*`, 'i')},
+              { episodeCount: { $gt: 0 } },
+              { numVotes: { $gt: 500 } },
+              { primaryTitle: new RegExp(`${ query }.*`, 'i') },
             ],
           },
         },
       ])
       .toArray()
-      .then((data) => {
+      .then(( data ) => {
         const results = data
           ? {
             response: data.length > 0,
@@ -183,14 +183,14 @@ routes.get('/api/search/:query', function (req, res) {
   });
 });
 
-routes.get('/api/seasons/:parentTconst', function (req, res) {
-  mongo((client) => {
+routes.get('/api/seasons/:parentTconst', function ( req, res ) {
+  mongo(( client ) => {
     const db = client.db('tvratings');
     const episode = db.collection('episode');
 
     episode
       .aggregate([
-        {$match: {parentTconst: req.params.parentTconst}},
+        { $match: { parentTconst: req.params.parentTconst } },
         // get rating
         {
           $lookup: {
@@ -200,7 +200,7 @@ routes.get('/api/seasons/:parentTconst', function (req, res) {
             as: 'rating',
           },
         },
-        {$unwind: '$rating'},
+        { $unwind: '$rating' },
         // get title info
         {
           $lookup: {
@@ -210,7 +210,7 @@ routes.get('/api/seasons/:parentTconst', function (req, res) {
             as: 'title',
           },
         },
-        {$unwind: '$title'},
+        { $unwind: '$title' },
         // format output
         {
           $project: {
@@ -226,7 +226,7 @@ routes.get('/api/seasons/:parentTconst', function (req, res) {
         },
       ])
       .toArray()
-      .then((data) => {
+      .then(( data ) => {
         const results = data || 500;
         res.send(results);
         if (client) client.close();
