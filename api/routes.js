@@ -1,9 +1,11 @@
-import {Router} from 'express';
+import { Router } from 'express';
 import axios from 'axios';
-// import addDays from 'date-fns/addDays';
+import { addDays, isAfter } from 'date-fns';
+
 import mongo from '../mongo.js';
-// import TMDB from './services/tmdb/TMDB';
-import mongoDB from './services/mongo/MongoDB';
+import TMDB from './services/tmdb/TMDB';
+import TmdbCache from "./schemas/TmdbCache";
+import ResourceController from "./controllers/ResourceController";
 
 const routes = new Router();
 
@@ -11,72 +13,10 @@ routes.get('/api', function (req, res) {
   res.send("What's up my nerdz?!?");
 });
 
-routes.get('/api/:tconst', async function (req, res) {
-  try {
-    const {tconst} = req.params;
-
-    if (typeof tconst === 'undefined' || tconst === '') {
-      // @TODO Melhorar o return das respostas de erro
-
-      console.log('tconst', tconst);
-
-      return res.send('No data found');
-    }
-
-    /*
-    Etapas:
-    - Verificar no banco se ja tem o cache do TMDB
-      -- Se tiver ele traz o cache do DB
-        --- Verificar se ele não é antigo (1h)
-          ---- Caso o cache antigo será consultado na API e será atualizado e retornar esses valores
-          ---- Caso não ser antigo ele será apenas retornado
-      -- Se não tiver consultar na API
-        -- Salvar o cache no banco de dados e retornar os dados
-     */
-
-    // const tmdb = TMDB('aa1dfbdc71f68d0de4576cd1f8b6a8a9');
-    let responseData,
-      consultInApi = false;
-
-    await mongoDB.find('tmdbcache', tconst).then((response) => {
-      console.log('mongoDB.find', response);
-
-      if (typeof response === 'undefined') {
-        consultInApi = true;
-      } else {
-        // Caso não seja dado antigo
-        // Caso seja
-        // updateContent = true;
-      }
-    });
-
-    /* if (consultInApi) {
-      await tmdb.get(`movie/${tconst}`).then(response => {
-        responseData = response;
-
-        if (response) {
-
-          response = {
-            ...response,
-            expires_at: addDays(new Date(), 1)
-          }
-
-          mongoDB.insertOne('tmdbcache', response);
-        }
-
-      });
-    } */
-
-    console.log('RESULT DEVOLVIDO', responseData);
-  } catch (e) {
-    console.log('ERROR TRY CATCH', e);
-  }
-
-  return res.send('Fim ');
-});
+routes.get('/api/:tconst', ResourceController.find);
 
 routes.get('/api/poster/:tconst', function (req, res) {
-  const url = `http://www.omdbapi.com/?apikey=${process.env.OMDB_API}&i=${req.params.tconst}`;
+  const url = `http://www.omdbapi.com/?apikey=${ process.env.OMDB_API }&i=${ req.params.tconst }`;
   const placeholder = 'https://via.placeholder.com/300x450';
 
   axios.get(url, function (error, response, body) {
@@ -96,7 +36,7 @@ routes.get('/api/count/:type', function (req, res) {
   mongo((client) => {
     const db = client.db('tvratings');
     const col = db.collection(req.params.type);
-    col.countDocuments().then((data) => res.send(`${data} records`));
+    col.countDocuments().then((data) => res.send(`${ data } records`));
   });
 });
 
@@ -223,7 +163,7 @@ routes.get('/api/search/:query', function (req, res) {
             $and: [
               {episodeCount: {$gt: 0}},
               {numVotes: {$gt: 500}},
-              {primaryTitle: new RegExp(`${query}.*`, 'i')},
+              {primaryTitle: new RegExp(`${ query }.*`, 'i')},
             ],
           },
         },

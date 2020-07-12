@@ -89,4 +89,4 @@ class TMDB {
   }
 }
 
-export default new TMDB()
+export default TMDB

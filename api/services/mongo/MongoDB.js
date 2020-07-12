@@ -1,13 +1,15 @@
 import mongo from '../../../mongo';
 
 class MongoDB {
-  async find(table, tconst) {
+  async find (table, tconst) {
     mongo((client) => {
-      const db = client.db('tvratings');
-      const collection = db.collection(table);
+      const db = client.db('tvratings'),
+        collection = db.collection(table);
+
+      console.log('Ola')
 
       collection
-        .findOne({ imdb_id: tconst })
+        .findOne({tconst: tconst})
         .then(function (result) {
           client.close();
 
@@ -19,10 +21,10 @@ class MongoDB {
     });
   }
 
-  async insertOne(table, json) {
+  async insertOne (table, json) {
     mongo((client) => {
-      const db = client.db('tvratings');
-      const collection = db.collection(table);
+      const db = client.db('tvratings'),
+        collection = db.collection(table);
 
       collection
         .insertOne(json)
