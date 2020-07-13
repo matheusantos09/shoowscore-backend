@@ -1,30 +1,20 @@
 version: '3'
 
 services:
-  data:
-    container_name: data
-    image: data
-    build:
-      context: ./
-      dockerfile: ./data/Dockerfile
-    networks:
-      - shoowscore
-    links:
-      - "mongo"
 
-  api:
-    container_name: api
-    image: api
-    build:
-      context: ./
-      dockerfile: ./api/Dockerfile
-    restart: always
-    ports:
-      - "3000:3000"
-    networks:
-      - shoowscore
-    links:
-      - "mongo"
+#  api:
+#    container_name: api
+#    image: api
+#    build:
+#      context: ./
+#      dockerfile: ./api/Dockerfile
+#    restart: always
+#    ports:
+#      - "3000:3000"
+#    networks:
+#      - shoowscore
+#    links:
+#      - "mongo"
 
   mongo:
     container_name: mongo
@@ -47,8 +37,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      - api
+#    depends_on:
+#      - api
     networks:
       - shoowscore
 

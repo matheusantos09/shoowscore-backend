@@ -1,8 +1,11 @@
 import express from 'express';
-import routes from './routes';
 import mongoose from 'mongoose'
 
+import routes from './routes';
+
 class App {
+  public server: any;
+
   constructor () {
     this.server = express();
 
@@ -20,7 +23,7 @@ class App {
     this.server.use(routes);
   }
 
-  apiKeyVerify () {
+  /*apiKeyVerify () {
     app.use(function ( req, res, next ) {
       const key = req.headers['x-api-key'];
       if (key && key === process.env.API_KEY) {
@@ -28,10 +31,10 @@ class App {
       }
       res.send('Invalid API key supplied');
     });
-  }
+  }*/
 
   database () {
-    mongoose.connect('mongodb://127.0.0.1:27017/tvratings', {
+    mongoose.connect(`mongodb://${ process.env.MONGO_DBHOST }:${ process.env.MONGO_DBPORT }/${ process.env.MONGO_DBNANE }`, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })

@@ -27,7 +27,7 @@ class ResourceController {
           -- Salvar o cache no banco de dados e retornar os dados
        */
 
-      const tmdb = new TMDB('aa1dfbdc71f68d0de4576cd1f8b6a8a9');
+      const tmdb = new TMDB(process.env.TMDB_API_KEY);
       let responseData,
         updateContent = false,
         consultInApi = false;
@@ -64,7 +64,7 @@ class ResourceController {
             response = {
               ...response,
               tconst: response.imdb_id,
-              expires_at: addDays(new Date(), 1)
+              expires_at: addDays(new Date(), process.env.TMDB_CACHE_REQUEST_DAY)
             }
 
             if (updateContent) {

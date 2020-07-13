@@ -1,10 +1,10 @@
-import cors from 'cors';
-// import dotenv from 'dotenv';
 import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 import app from './app';
-
-// dotenv.config();
 
 app.use(cors());
 
