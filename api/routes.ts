@@ -13,6 +13,8 @@ routes.get('/api', function ( req, res ) {
   res.send("What's up my nerdz?!?");
 });
 
+routes.get('/api/search/:query', ResourceController.search);
+
 routes.get('/api/:tconst', ResourceController.find);
 
 routes.get('/api/poster/:tconst', function ( req, res ) {
@@ -32,7 +34,7 @@ routes.get('/api/poster/:tconst', function ( req, res ) {
   });
 });
 
-routes.get('/api/count/:type', function ( req, res ) {
+/*routes.get('/api/count/:type', function ( req, res ) {
   mongo(( client ) => {
     const db = client.db('tvratings');
     const col = db.collection(req.params.type);
@@ -232,6 +234,6 @@ routes.get('/api/seasons/:parentTconst', function ( req, res ) {
         if (client) client.close();
       });
   });
-});
+});*/
 
 module.exports = routes;

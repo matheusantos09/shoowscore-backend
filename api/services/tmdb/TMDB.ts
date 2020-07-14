@@ -80,8 +80,8 @@ class TMDB {
           };
         });
 
-      console.log('response');
-      console.log(response);
+      // console.log('response');
+      // console.log(response);
 
       return response.data;
     } catch (e) {

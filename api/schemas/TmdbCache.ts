@@ -26,9 +26,6 @@ interface TmdbCacheInterface extends Document {
   video?: boolean,
   vote_average?: number,
   vote_count?: number,
-  expires_at?: {
-    type: Date
-  }
 }
 
 const TmdbCacheSchema = new Schema({
@@ -57,11 +54,11 @@ const TmdbCacheSchema = new Schema({
   video: Boolean,
   vote_average: Number,
   vote_count: Number,
-  expires_at: {
-    type: Date
-  }
-}, {
-  timestamp: true
+  expireAt: {
+    type: Date,
+    default: Date.now,
+    index: { expireAfterSeconds: process.env.TMDB_CACHE_REQUEST_SECONDS },
+  },
 });
 
 export default model<TmdbCacheInterface>('TmdbCache', TmdbCacheSchema)
