@@ -13,9 +13,9 @@ routes.get('/api', function ( req, res ) {
   res.send("What's up my nerdz?!?");
 });
 
-routes.get('/api/search/:query', ResourceController.search);
+routes.get('/api/:type/:resourceId', ResourceController.find);
 
-routes.get('/api/:tconst', ResourceController.find);
+routes.get('/api/search/:query', ResourceController.search);
 
 routes.get('/api/poster/:tconst', function ( req, res ) {
   const url = `http://www.omdbapi.com/?apikey=${ process.env.OMDB_API }&i=${ req.params.tconst }`;

@@ -1,6 +1,7 @@
 import { model, Schema, Document } from 'mongoose'
 
 interface TmdbCacheInterface extends Document {
+  typeResource: string,
   tconst?: string,
   adult?: boolean,
   backdrop_path?: string,
@@ -26,9 +27,13 @@ interface TmdbCacheInterface extends Document {
   video?: boolean,
   vote_average?: number,
   vote_count?: number,
+  videos?: [],
+  images?: [],
+  recommendations?: [],
 }
 
 const TmdbCacheSchema = new Schema({
+  typeResource: String,
   tconst: String,
   adult: Boolean,
   backdrop_path: String,
@@ -54,6 +59,9 @@ const TmdbCacheSchema = new Schema({
   video: Boolean,
   vote_average: Number,
   vote_count: Number,
+  videos: Array,
+  images: Array,
+  recommendations: Array,
   expireAt: {
     type: Date,
     default: Date.now,

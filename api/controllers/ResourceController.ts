@@ -4,6 +4,7 @@ import _ from 'lodash'
 import TMDB from '../services/tmdb/TMDB';
 import TmdbCache from "../schemas/TmdbCache";
 import SearchCache from "../schemas/SearchCache";
+import ResourceRepository from "../repositories/ResourceRepository";
 
 interface SearchResponseInterface {
   tv?: {
@@ -23,15 +24,9 @@ interface SearchResponseInterface {
 class ResourceController {
   async find ( req: Request, res: Response ): Promise<Response> {
     try {
-      const { tconst } = req.params;
+      const { resourceId, type } = req.params;
 
-      if (typeof tconst === 'undefined' || tconst === '') {
-        // @TODO Melhorar o return das respostas de erro
-
-        console.log('tconst', tconst);
-
-        return res.send('No data found');
-      }
+      await ResourceRepository.findValidations(resourceId, type)
 
       /*
       Etapas:
@@ -48,7 +43,7 @@ class ResourceController {
       let responseData,
         consultInApi = false;
 
-      const findResource = await TmdbCache.findOne({ tconst }, function ( err, data ) {
+      const findResource = await TmdbCache.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
 
         if (!err) {
 
@@ -65,33 +60,58 @@ class ResourceController {
       });
 
       if (consultInApi) {
-        await tmdb.get(`movie/${ tconst }`).then(response => {
+        await tmdb.get(`${ type }/${ resourceId }`).then(response => {
           responseData = response;
 
           if (response) {
 
-            response = {
+            responseData = {
               ...response,
-              tconst: response.imdb_id,
+              typeResource: type,
             }
-
-            TmdbCache.create(response, function ( err, data ) {
-              if (!err) {
-                //@TODO TUDO OK
-              } else {
-                //@TODO Tratar erro
-              }
-
-            });
 
           }
 
         });
+        await tmdb.get(`${ type }/${ resourceId }/images`).then(response => {
+          responseData = {
+            ...responseData,
+            'images': response
+          };
+        });
+        await tmdb.get(`${ type }/${ resourceId }/videos`).then(response => {
+          if (response.results) {
+            responseData = {
+              ...responseData,
+              'videos': response.results
+            };
+          }
+        });
+        await tmdb.get(`${ type }/${ resourceId }/recommendations`).then(response => {
+          if (response.results) {
+            responseData = {
+              ...responseData,
+              'recommendations': response.results
+            };
+          }
+        });
+
+        if (responseData) {
+          await TmdbCache.create(responseData, function ( err, data ) {
+            if (!err) {
+              //@TODO TUDO OK
+            } else {
+              //@TODO Tratar erro
+            }
+
+          });
+        }
+
       } else {
         responseData = findResource
       }
 
-      console.log('RESULT DEVOLVIDO', responseData);
+      // console.log('RESULT DEVOLVIDO', responseData);
 
       return res.json(responseData);
     } catch (e) {
@@ -130,8 +150,6 @@ class ResourceController {
       }
 
     });
-
-    console.log(consultApi)
 
     if (consultApi) {
 
@@ -178,7 +196,6 @@ class ResourceController {
         message: 'data not found'
       });
   }
-
 }
 
 export default new ResourceController()
