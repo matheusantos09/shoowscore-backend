@@ -19,6 +19,25 @@ class ResourceRepository {
     }
 
   }
+
+  async findRecommendationsValidations ( resourceId, type ) {
+    if (typeof resourceId === 'undefined' || resourceId === '' || typeof type === 'undefined' || type === '') {
+      // @TODO Melhorar o return das respostas de erro
+
+      console.log('resourceId', resourceId);
+
+      throw Error('Not found params required')
+    }
+
+    if (type !== TMDB_TYPES.tv) {
+      throw Error('Type send not allowed')
+    }
+
+    if (isNaN(resourceId)) {
+      throw Error('Resource ID not a number')
+    }
+
+  }
 }
 
 export default new ResourceRepository()

@@ -4,7 +4,7 @@ import { addDays, isAfter } from 'date-fns';
 
 import mongo from '../mongo.js';
 import TMDB from './services/tmdb/TMDB';
-import TmdbCache from "./schemas/TmdbCache";
+import TmdbCache from "./schemas/TmdbCacheMovie";
 import ResourceController from "./controllers/ResourceController";
 
 const routes = new Router();
@@ -14,9 +14,12 @@ routes.get('/api', function ( req, res ) {
 });
 
 routes.get('/api/:type/:resourceId', ResourceController.find);
+routes.get('/api/:type/:resourceId/recommendations', ResourceController.findRecommendations);
+routes.get('/api/:type/:resourceId/videos', ResourceController.findVideos);
 
 routes.get('/api/search/:query', ResourceController.search);
 
+/*
 routes.get('/api/poster/:tconst', function ( req, res ) {
   const url = `http://www.omdbapi.com/?apikey=${ process.env.OMDB_API }&i=${ req.params.tconst }`;
   const placeholder = 'https://via.placeholder.com/300x450';
@@ -34,7 +37,7 @@ routes.get('/api/poster/:tconst', function ( req, res ) {
   });
 });
 
-/*routes.get('/api/count/:type', function ( req, res ) {
+routes.get('/api/count/:type', function ( req, res ) {
   mongo(( client ) => {
     const db = client.db('tvratings');
     const col = db.collection(req.params.type);

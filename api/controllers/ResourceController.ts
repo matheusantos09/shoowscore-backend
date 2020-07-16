@@ -2,9 +2,12 @@ import { Request, Response } from 'express'
 import _ from 'lodash'
 
 import TMDB from '../services/tmdb/TMDB';
-import TmdbCache from "../schemas/TmdbCache";
+import { TYPES as TMDB_TYPES } from '../services/tmdb/types'
+import TmdbCacheMovie from "../schemas/TmdbCacheMovie";
+import TmdbCacheTv from "../schemas/TmdbCacheTv";
 import SearchCache from "../schemas/SearchCache";
 import ResourceRepository from "../repositories/ResourceRepository";
+import TmdbCacheRecommendation from "../schemas/TmdbCacheRecommendation";
 
 interface SearchResponseInterface {
   tv?: {
@@ -22,28 +25,30 @@ interface SearchResponseInterface {
 }
 
 class ResourceController {
+  private tmdbClass: TMDB;
+
+  constructor () {
+    this.tmdbClass = new TMDB(process.env.TMDB_API_KEY);
+  }
+
   async find ( req: Request, res: Response ): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
 
       await ResourceRepository.findValidations(resourceId, type)
 
-      /*
-      Etapas:
-      - Verificar no banco se ja tem o cache do TMDB
-        -- Se tiver ele traz o cache do DB
-          --- Verificar se ele não é antigo (1h)
-            ---- Caso o cache antigo será consultado na API e será atualizado e retornar esses valores
-            ---- Caso não ser antigo ele será apenas retornado
-        -- Se não tiver consultar na API
-          -- Salvar o cache no banco de dados e retornar os dados
-       */
-
-      const tmdb = new TMDB(process.env.TMDB_API_KEY);
       let responseData,
-        consultInApi = false;
+        consultInApi = false,
+        TMDBInterfaceConsult;
 
-      const findResource = await TmdbCache.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
+      if (TMDB_TYPES.movie === type) {
+        TMDBInterfaceConsult = TmdbCacheMovie
+      }
+      if (TMDB_TYPES.tv === type) {
+        TMDBInterfaceConsult = TmdbCacheTv
+      }
+
+      const findResource = await TMDBInterfaceConsult.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
 
         if (!err) {
 
@@ -60,7 +65,7 @@ class ResourceController {
       });
 
       if (consultInApi) {
-        await tmdb.get(`${ type }/${ resourceId }`).then(response => {
+        await this.tmdbClass.get(`${ type }/${ resourceId }`).then(response => {
           responseData = response;
 
           if (response) {
@@ -73,13 +78,13 @@ class ResourceController {
           }
 
         });
-        await tmdb.get(`${ type }/${ resourceId }/images`).then(response => {
+        await this.tmdbClass.get(`${ type }/${ resourceId }/images`).then(response => {
           responseData = {
             ...responseData,
             'images': response
           };
         });
-        await tmdb.get(`${ type }/${ resourceId }/videos`).then(response => {
+        await this.tmdbClass.get(`${ type }/${ resourceId }/videos`).then(response => {
           if (response.results) {
             responseData = {
               ...responseData,
@@ -87,7 +92,7 @@ class ResourceController {
             };
           }
         });
-        await tmdb.get(`${ type }/${ resourceId }/recommendations`).then(response => {
+        await this.tmdbClass.get(`${ type }/${ resourceId }/recommendations`).then(response => {
           if (response.results) {
             responseData = {
               ...responseData,
@@ -97,14 +102,63 @@ class ResourceController {
         });
 
         if (responseData) {
-          await TmdbCache.create(responseData, function ( err, data ) {
-            if (!err) {
-              //@TODO TUDO OK
-            } else {
-              //@TODO Tratar erro
-            }
+          await TMDBInterfaceConsult.create(responseData)
+        }
 
-          });
+      } else {
+        responseData = findResource
+      }
+
+      // console.log('RESULT DEVOLVIDO', responseData);
+
+      return res.json(responseData);
+    } catch (e) {
+      console.log('ERROR TRY CATCH', e);
+
+      return res.json({
+        error: true,
+        message: 'Not load resource'
+      })
+    }
+  }
+
+  async findRecommendations ( req: Request, res: Response ): Promise<Response> {
+    try {
+      const { resourceId, type } = req.params;
+
+      await ResourceRepository.findRecommendationsValidations(resourceId, type)
+
+      let responseData,
+        consultInApi = false;
+
+      const findResource = await TmdbCacheRecommendation.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
+
+        if (!err) {
+
+          if (!data) {
+            consultInApi = true;
+          }
+
+        } else {
+          //@TODO Tratar erro
+
+          consultInApi = true;
+        }
+
+      });
+
+      if (consultInApi) {
+        await this.tmdbClass.get(`${ type }/${ resourceId }/recommendations`).then(response => {
+          if (response.results) {
+            responseData = {
+              ...responseData,
+              'recommendations': response.results
+            };
+          }
+        });
+
+        if (responseData) {
+          await TmdbCacheRecommendation.create(responseData)
         }
 
       } else {
