@@ -8,11 +8,13 @@ interface SearchCacheInterface extends Document {
 const SearchCacheSchema = new Schema({
   query: String,
   results: Object,
-  expireAt: {
+  expiresAt: {
     type: Date,
     default: Date.now,
-    index: { expireAfterSeconds: process.env.TMDB_CACHE_QUERY_SECONDS },
+    expires: 0,
   },
 });
+
+SearchCacheSchema.index({ expiresAt: 1 }, { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_SEARCH) });
 
 export default model<SearchCacheInterface>('SearchCache', SearchCacheSchema, 'search_caches')

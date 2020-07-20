@@ -8,11 +8,13 @@ interface TmdbCacheRecommendationInterface extends Document {
 const TmdbCacheRecommendationSchema = new Schema({
   id: Number,
   recommendations: Array,
-  expireAt: {
+  expiresAt: {
     type: Date,
     default: Date.now,
-    index: { expireAfterSeconds: process.env.TMDB_CACHE_REQUEST_SECONDS },
+    expires: 0,
   },
 });
+
+TmdbCacheRecommendationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_RECOMMENDATIONS) });
 
 export default model<TmdbCacheRecommendationInterface>('TmdbCacheRecommendation', TmdbCacheRecommendationSchema, 'tmdb_cache_recommendations')

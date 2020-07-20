@@ -76,11 +76,13 @@ const TmdbCacheMovieSchema = new Schema({
   videos: Array,
   images: Array,
   recommendations: Array,
-  expireAt: {
+  expiresAt: {
     type: Date,
     default: Date.now,
-    index: { expireAfterSeconds: process.env.TMDB_CACHE_REQUEST_SECONDS },
+    expires: 0,
   },
 });
+
+TmdbCacheMovieSchema.index({ expiresAt: 1 }, { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_MOVIES) });
 
 export default model<TmdbCacheMovieInterface>('TmdbCacheMovie', TmdbCacheMovieSchema, 'tmdb_cache_resources')

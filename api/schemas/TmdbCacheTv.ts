@@ -102,7 +102,7 @@ interface TmdbCacheTvInterface extends Document {
   typeResource?: string,
   videos?: [],
   images?: [],
-  recommendations?: [],
+  recommendations?: []
 }
 
 const TmdbCacheTvSchema = new Schema({
@@ -138,11 +138,13 @@ const TmdbCacheTvSchema = new Schema({
   videos: Array,
   images: Array,
   recommendations: Array,
-  expireAt: {
+  expiresAt: {
     type: Date,
     default: Date.now,
-    index: { expireAfterSeconds: process.env.TMDB_CACHE_REQUEST_SECONDS },
+    expires: 0,
   },
 });
+
+TmdbCacheTvSchema.index({ expiresAt: 1 }, { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_TV) });
 
 export default model<TmdbCacheTvInterface>('TmdbCacheTv', TmdbCacheTvSchema, 'tmdb_cache_resources')

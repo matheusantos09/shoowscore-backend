@@ -13,12 +13,12 @@ routes.get('/api', function ( req, res ) {
   res.send("Oque está procurando aqui parece que já sei foi...");
 });
 
+routes.get('/api/search/:query', ResourceController.search);
+
 routes.get('/api/:type/:resourceId', ResourceController.find);
 routes.get('/api/:type/:resourceId/recommendations', ResourceController.getRecommendations);
 routes.get('/api/:type/:resourceId/videos', ResourceController.getVideos);
 routes.get('/api/:type/:resourceId/images', ResourceController.getImages);
-
-routes.get('/api/search/:query', ResourceController.search);
 
 /*
 routes.get('/api/poster/:tconst', function ( req, res ) {

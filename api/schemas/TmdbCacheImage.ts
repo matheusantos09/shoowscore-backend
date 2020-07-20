@@ -8,11 +8,13 @@ interface TmdbCacheImageInterface extends Document {
 const TmdbCacheImageSchema = new Schema({
   id: Number,
   images: Array,
-  expireAt: {
+  expiresAt: {
     type: Date,
     default: Date.now,
-    index: { expireAfterSeconds: process.env.TMDB_CACHE_REQUEST_SECONDS },
+    expires: 0,
   },
 });
+
+TmdbCacheImageSchema.index({ expiresAt: 1 }, { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_IMAGES) });
 
 export default model<TmdbCacheImageInterface>('TmdbCacheImage', TmdbCacheImageSchema, 'tmdb_cache_images')
