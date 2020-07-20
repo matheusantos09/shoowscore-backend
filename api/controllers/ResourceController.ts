@@ -3,11 +3,15 @@ import _ from 'lodash'
 
 import TMDB from '../services/tmdb/TMDB';
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types'
+
+import ResourceRepository from "../repositories/ResourceRepository";
+
+import SearchCache from "../schemas/SearchCache";
 import TmdbCacheMovie from "../schemas/TmdbCacheMovie";
 import TmdbCacheTv from "../schemas/TmdbCacheTv";
-import SearchCache from "../schemas/SearchCache";
-import ResourceRepository from "../repositories/ResourceRepository";
 import TmdbCacheRecommendation from "../schemas/TmdbCacheRecommendation";
+import TmdbCacheVideo from "../schemas/TmdbCacheVideo";
+import TmdbCacheImage from "../schemas/TmdbCacheImage";
 
 interface SearchResponseInterface {
   tv?: {
@@ -25,17 +29,12 @@ interface SearchResponseInterface {
 }
 
 class ResourceController {
-  private tmdbClass: TMDB;
-
-  constructor () {
-    this.tmdbClass = new TMDB(process.env.TMDB_API_KEY);
-  }
 
   async find ( req: Request, res: Response ): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
 
-      await ResourceRepository.findValidations(resourceId, type)
+      await ResourceRepository.defaultValidations(resourceId, type)
 
       let responseData,
         consultInApi = false,
@@ -65,7 +64,8 @@ class ResourceController {
       });
 
       if (consultInApi) {
-        await this.tmdbClass.get(`${ type }/${ resourceId }`).then(response => {
+
+        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }`).then(response => {
           responseData = response;
 
           if (response) {
@@ -77,28 +77,6 @@ class ResourceController {
 
           }
 
-        });
-        await this.tmdbClass.get(`${ type }/${ resourceId }/images`).then(response => {
-          responseData = {
-            ...responseData,
-            'images': response
-          };
-        });
-        await this.tmdbClass.get(`${ type }/${ resourceId }/videos`).then(response => {
-          if (response.results) {
-            responseData = {
-              ...responseData,
-              'videos': response.results
-            };
-          }
-        });
-        await this.tmdbClass.get(`${ type }/${ resourceId }/recommendations`).then(response => {
-          if (response.results) {
-            responseData = {
-              ...responseData,
-              'recommendations': response.results
-            };
-          }
         });
 
         if (responseData) {
@@ -122,11 +100,11 @@ class ResourceController {
     }
   }
 
-  async findRecommendations ( req: Request, res: Response ): Promise<Response> {
+  async getRecommendations ( req: Request, res: Response ): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
 
-      await ResourceRepository.findRecommendationsValidations(resourceId, type)
+      await ResourceRepository.getRecommendationsValidations(resourceId, type)
 
       let responseData,
         consultInApi = false;
@@ -148,7 +126,7 @@ class ResourceController {
       });
 
       if (consultInApi) {
-        await this.tmdbClass.get(`${ type }/${ resourceId }/recommendations`).then(response => {
+        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/recommendations`).then(response => {
           if (response.results) {
             responseData = {
               ...responseData,
@@ -178,6 +156,118 @@ class ResourceController {
     }
   }
 
+  async getVideos ( req: Request, res: Response ): Promise<Response> {
+    try {
+      const { resourceId, type } = req.params;
+
+      await ResourceRepository.defaultValidations(resourceId, type)
+
+      let responseData,
+        consultInApi = false;
+
+      const findResource = await TmdbCacheVideo.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
+
+        if (!err) {
+
+          if (!data) {
+            consultInApi = true;
+          }
+
+        } else {
+          //@TODO Tratar erro
+
+          consultInApi = true;
+        }
+
+      });
+
+      if (consultInApi) {
+
+        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/recommendations`).then(response => {
+          if (response.results) {
+            responseData = {
+              ...responseData,
+              'recommendations': response.results
+            };
+          }
+        });
+
+        if (responseData) {
+          await TmdbCacheVideo.create(responseData)
+        }
+
+      } else {
+        responseData = findResource
+      }
+
+      // console.log('RESULT DEVOLVIDO', responseData);
+
+      return res.json(responseData);
+    } catch (e) {
+      console.log('ERROR TRY CATCH', e);
+
+      return res.json({
+        error: true,
+        message: 'Not load resource'
+      })
+    }
+  }
+
+  async getImages ( req: Request, res: Response ): Promise<Response> {
+    try {
+      const { resourceId, type } = req.params;
+
+      await ResourceRepository.defaultValidations(resourceId, type)
+
+      let responseData,
+        consultInApi = false;
+
+      const findResource = await TmdbCacheImage.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
+
+        if (!err) {
+
+          if (!data) {
+            consultInApi = true;
+          }
+
+        } else {
+          //@TODO Tratar erro
+
+          consultInApi = true;
+        }
+
+      });
+
+      if (consultInApi) {
+
+        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/images`).then(response => {
+          responseData = {
+            ...responseData,
+            'images': response
+          };
+        });
+
+        if (responseData) {
+          await TmdbCacheImage.create(responseData)
+        }
+
+      } else {
+        responseData = findResource
+      }
+
+      // console.log('RESULT DEVOLVIDO', responseData);
+
+      return res.json(responseData);
+    } catch (e) {
+      console.log('ERROR TRY CATCH', e);
+
+      return res.json({
+        error: true,
+        message: 'Not load resource'
+      })
+    }
+  }
+
   async search ( req: Request, res: Response ): Promise<Response> {
 
     let { query } = req.params,
@@ -185,11 +275,10 @@ class ResourceController {
       responseData: SearchResponseInterface = {};
 
     if (typeof query === 'undefined' || !query) {
-      return res.status(400)
-        .json({
-          error: true,
-          message: 'Parameter search not found'
-        })
+      return res.status(400).json({
+        error: true,
+        message: 'Parameter search not found'
+      })
     }
 
     query = decodeURIComponent(query);

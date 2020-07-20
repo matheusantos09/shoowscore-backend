@@ -15,4 +15,4 @@ const SearchCacheSchema = new Schema({
   },
 });
 
-export default model<SearchCacheInterface>('SearchCache', SearchCacheSchema)
+export default model<SearchCacheInterface>('SearchCache', SearchCacheSchema, 'search_caches')

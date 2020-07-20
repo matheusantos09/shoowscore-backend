@@ -10,12 +10,13 @@ import ResourceController from "./controllers/ResourceController";
 const routes = new Router();
 
 routes.get('/api', function ( req, res ) {
-  res.send("What's up my nerdz?!?");
+  res.send("Oque está procurando aqui parece que já sei foi...");
 });
 
 routes.get('/api/:type/:resourceId', ResourceController.find);
-routes.get('/api/:type/:resourceId/recommendations', ResourceController.findRecommendations);
-routes.get('/api/:type/:resourceId/videos', ResourceController.findVideos);
+routes.get('/api/:type/:resourceId/recommendations', ResourceController.getRecommendations);
+routes.get('/api/:type/:resourceId/videos', ResourceController.getVideos);
+routes.get('/api/:type/:resourceId/images', ResourceController.getImages);
 
 routes.get('/api/search/:query', ResourceController.search);
 

@@ -1,7 +1,7 @@
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types'
 
 class ResourceRepository {
-  async findValidations ( resourceId, type ) {
+  async defaultValidations ( resourceId, type ) {
     if (typeof resourceId === 'undefined' || resourceId === '' || typeof type === 'undefined' || type === '') {
       // @TODO Melhorar o return das respostas de erro
 
@@ -20,7 +20,7 @@ class ResourceRepository {
 
   }
 
-  async findRecommendationsValidations ( resourceId, type ) {
+  async getRecommendationsValidations ( resourceId, type ) {
     if (typeof resourceId === 'undefined' || resourceId === '' || typeof type === 'undefined' || type === '') {
       // @TODO Melhorar o return das respostas de erro
 
@@ -38,6 +38,7 @@ class ResourceRepository {
     }
 
   }
+
 }
 
 export default new ResourceRepository()
