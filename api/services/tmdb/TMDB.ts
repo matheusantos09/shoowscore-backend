@@ -76,7 +76,7 @@ class TMDB {
           throw {
             code: error.response.status,
             message: error.message,
-            payload: error.response.data,
+            results: error.response.data,
           };
         });
 

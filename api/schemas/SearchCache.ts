@@ -2,12 +2,12 @@ import { model, Schema, Document } from 'mongoose'
 
 interface SearchCacheInterface extends Document {
   query: string,
-  payload: object,
+  results: object,
 }
 
 const SearchCacheSchema = new Schema({
   query: String,
-  payload: Object,
+  results: Object,
   expireAt: {
     type: Date,
     default: Date.now,

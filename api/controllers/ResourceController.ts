@@ -288,7 +288,7 @@ class ResourceController {
     }, function ( err, data ) {
 
       if (data) {
-        responseData = data.payload
+        responseData = data.results
         consultApi = false
       }
 
@@ -318,7 +318,7 @@ class ResourceController {
       if (!_.isEmpty(responseData)) {
         SearchCache.create({
           query,
-          payload: responseData
+          results: responseData
         })
       }
 
@@ -328,7 +328,7 @@ class ResourceController {
       return res.json({
         error: false,
         message: 'Search results',
-        payload: responseData
+        results: responseData
       })
     }
 

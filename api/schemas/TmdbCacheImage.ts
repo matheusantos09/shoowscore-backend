@@ -2,12 +2,12 @@ import { model, Schema, Document } from 'mongoose'
 
 interface TmdbCacheImageInterface extends Document {
   id?: number,
-  imagess?: [],
+  images?: [],
 }
 
 const TmdbCacheImageSchema = new Schema({
   id: Number,
-  imagess: Array,
+  images: Array,
   expireAt: {
     type: Date,
     default: Date.now,
