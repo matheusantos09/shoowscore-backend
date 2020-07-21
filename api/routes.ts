@@ -6,6 +6,7 @@ import mongo from '../mongo.js';
 import TMDB from './services/tmdb/TMDB';
 import TmdbCache from "./schemas/TmdbCacheMovie";
 import ResourceController from "./controllers/ResourceController";
+import NotFoundController from "./controllers/NotFoundController";
 
 const routes = new Router();
 
@@ -19,6 +20,8 @@ routes.get('/api/:type/:resourceId', ResourceController.find);
 routes.get('/api/:type/:resourceId/recommendations', ResourceController.getRecommendations);
 routes.get('/api/:type/:resourceId/videos', ResourceController.getVideos);
 routes.get('/api/:type/:resourceId/images', ResourceController.getImages);
+
+routes.get('*', NotFoundController.notFound)
 
 /*
 routes.get('/api/poster/:tconst', function ( req, res ) {
