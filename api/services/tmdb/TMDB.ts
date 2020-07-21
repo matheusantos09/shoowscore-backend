@@ -4,62 +4,58 @@ class TMDB {
 
   public apiKey: string;
   public language: string;
+  public baseUri: string;
+  public imagesUri: string;
+  public timeout: number;
 
-  constructor ( apiKey, language = 'en' ) {
+  constructor ( apiKey, language = 'en-US' ) {
     this.apiKey = apiKey;
     this.language = language;
+    this.baseUri = "http://api.themoviedb.org/3/";
+    this.imagesUri = "http://image.tmdb.org/t/p/";
+    this.timeout = 10000;
   }
 
-  async get ( resource, parameters = {} ) {
-    // while (true) {
-    // @TODO Trar melhor quando não encontrar o resultado na api do TMDB e devovler 404
-    try {
-      const response = await apiTmdb
-        .get(`https://api.themoviedb.org/3/${ resource }`, {
-          params: {
-            api_key: this.apiKey,
-            ...parameters,
-          },
-        })
-        .catch(( error ) => {
+  async prepareQuerySearch ( options = {} ) {
 
-          // Error 😨
-          if (error.response) {
-            /*
-             * The request was made and the server responded with a
-             * status code that falls out of the range of 2xx
-             */
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            /*
-             * The request was made but no response was received, `error.request`
-             * is an instance of XMLHttpRequest in the browser and an instance
-             * of http.ClientRequest in Node.js
-             */
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request and triggered an Error
-            console.log('Error', error.message);
-          }
+    let query = "?api_key=" + this.apiKey + "&language=" + this.language;
 
-          throw {
-            code: error.response.status,
-            message: error.message,
-            results: error.response.data,
-          };
-        });
-
-      // console.log('response');
-      // console.log(response);
-
-      return response.data;
-    } catch (e) {
-      console.log('ERROR:', e);
+    if (Object.keys(options).length) {
+      Object.keys(options).map(option => {
+        if (options.hasOwnProperty(option) && option !== "id" && option !== "body") {
+          query = query + "&" + option + "=" + options[option];
+        }
+      })
     }
-    // }
+
+    return query;
   }
+
+  async validateCallbacks ( success, error ) {
+    if (typeof success !== "function" || typeof error !== "function") {
+      throw "success and error parameters must be functions!";
+    }
+  }
+
+  async validateRequired ( args, argsReq, opt, optReq, allOpt = false ) {
+
+    if (args.length !== argsReq) {
+      throw "The method requires  " + argsReq + " arguments and you are sending " + args.length + "!";
+    }
+
+    if (allOpt) {
+      return;
+    }
+
+    if (argsReq > 2) {
+      for (let i = 0; i < optReq.length; i = i + 1) {
+        if (!opt.hasOwnProperty(optReq[i])) {
+          throw optReq[i] + " is a required parameter and is not present in the options!";
+        }
+      }
+    }
+  }
+
 }
 
 export default TMDB
