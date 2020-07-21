@@ -1,4 +1,4 @@
-import { model, Schema, Document } from 'mongoose'
+import { Document, model, Schema } from 'mongoose'
 
 interface SearchCacheInterface extends Document {
   query: string,

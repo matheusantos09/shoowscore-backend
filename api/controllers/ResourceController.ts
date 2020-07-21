@@ -147,7 +147,8 @@ class ResourceController {
 
       return res.json(responseData);
     } catch (e) {
-      console.log('ERROR TRY CATCH', e);
+      // console.log('ERROR TRY CATCH', e);
+      console.log('ERROR TRY CATCH', e.code);
 
       return res.json({
         error: true,

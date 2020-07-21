@@ -21,36 +21,7 @@ class TMDB {
             ...parameters,
           },
         })
-        // .then(resp => resp)
         .catch(( error ) => {
-          // const errorResponse = error.response;
-
-          // if (!String(errorResponse.status).startsWith('2')) {
-          // if (errorResponse.headers['x-ratelimit-remaining']) {
-          // const rateLimitRemaining = Number(errorResponse.headers['x-ratelimit-remaining']);
-
-          // if (!rateLimitRemaining) {
-          //   const currentTime = Math.round(new Date().getTime() / 1000);
-          //   const rateLimitReset = Number(errorResponse.headers['x-ratelimit-reset']);
-
-          // // The minimum 30 seconds cooldown ensures that in case 'x-ratelimit-reset'
-          // // time is wrong, we don't bombard the TMDb server with requests.
-          // // const cooldownTime = Math.max(rateLimitReset - currentTime, 30);
-
-          // log.debug('reached rate limit; waiting %d seconds', cooldownTime);
-
-          // await delay(cooldownTime * 1000);
-
-          // continue;
-          // }
-          // }
-
-          /* if (errorResponse.statusCode === 404) {
-            throw new NotFoundError();
-          } */
-
-          /* throw new RemoteError(errorResponse.body.status_message, response.body.status_code); */
-          // }
 
           // Error 😨
           if (error.response) {

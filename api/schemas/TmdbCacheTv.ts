@@ -1,4 +1,4 @@
-import { model, Schema, Document } from 'mongoose'
+import { Document, model, Schema } from 'mongoose'
 
 interface TmdbCacheTvInterface extends Document {
   backdrop_path?: string,
@@ -25,7 +25,7 @@ interface TmdbCacheTvInterface extends Document {
     vote_count?: number
   },
   name?: string,
-  next_episode_to_air?: boolean,
+  next_episode_to_air?: boolean | [],
   networks?: {
     name: string,
     id: number,
@@ -118,7 +118,7 @@ const TmdbCacheTvSchema = new Schema({
   last_air_date: String,
   last_episode_to_air: Object,
   name: String,
-  next_episode_to_air: Boolean,
+  next_episode_to_air: Boolean || Array,
   networks: Array,
   number_of_episodes: Number,
   number_of_seasons: Number,
