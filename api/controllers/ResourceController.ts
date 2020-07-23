@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import _ from 'lodash'
 
-import TMDB from '../services/tmdb/TMDB';
+import { ShoowDb } from '../services/tmdb';
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types'
 
 import ResourceRepository from "../repositories/ResourceRepository";
@@ -65,7 +65,7 @@ class ResourceController {
 
       if (consultInApi) {
 
-        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }`).then(response => {
+        await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }`).then(response => {
           responseData = response;
 
           if (response) {
@@ -126,11 +126,13 @@ class ResourceController {
       });
 
       if (consultInApi) {
-        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/recommendations`).then(response => {
-          if (response.results) {
+        await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/recommendations`).then(response => {
+          if (response) {
             responseData = {
               ...responseData,
-              'recommendations': response.results
+              'id': resourceId,
+              'typeResource': type,
+              'recommendations': response
             };
           }
         });
@@ -184,11 +186,13 @@ class ResourceController {
 
       if (consultInApi) {
 
-        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/recommendations`).then(response => {
-          if (response.results) {
+        await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/videos`).then(response => {
+          if (response) {
             responseData = {
               ...responseData,
-              'recommendations': response.results
+              'id': resourceId,
+              'typeResource': type,
+              'videos': response
             };
           }
         });
@@ -241,9 +245,11 @@ class ResourceController {
 
       if (consultInApi) {
 
-        await ( new TMDB(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/images`).then(response => {
+        await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/images`).then(response => {
           responseData = {
             ...responseData,
+            'id': resourceId,
+            'typeResource': type,
             'images': response
           };
         });
@@ -289,7 +295,7 @@ class ResourceController {
     }, function ( err, data ) {
 
       if (data) {
-        responseData = data.results
+        responseData = data
         consultApi = false
       }
 
@@ -297,9 +303,9 @@ class ResourceController {
 
     if (consultApi) {
 
-      const tmdb = new TMDB(process.env.TMDB_API_KEY);
+      const tmdb = new ShoowDb(process.env.TMDB_API_KEY);
 
-      await tmdb.get(`search/movie`, {
+      await tmdb.searchMovie({
         query
       }).then(response => {
         responseData = {
@@ -307,7 +313,7 @@ class ResourceController {
           'movie': response
         };
       });
-      await tmdb.get('search/tv', {
+      await tmdb.searchTv({
         query
       }).then(response => {
         responseData = {
