@@ -5,8 +5,6 @@ class ResourceRepository {
     if (typeof resourceId === 'undefined' || resourceId === '' || typeof type === 'undefined' || type === '') {
       // @TODO Melhorar o return das respostas de erro
 
-      console.log('resourceId', resourceId);
-
       throw Error('Not found params required')
     }
 
@@ -23,8 +21,6 @@ class ResourceRepository {
   async getRecommendationsValidations ( resourceId, type ) {
     if (typeof resourceId === 'undefined' || resourceId === '' || typeof type === 'undefined' || type === '') {
       // @TODO Melhorar o return das respostas de erro
-
-      console.log('resourceId', resourceId);
 
       throw Error('Not found params required')
     }

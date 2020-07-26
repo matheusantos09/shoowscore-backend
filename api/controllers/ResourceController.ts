@@ -13,6 +13,8 @@ import TmdbCacheRecommendation from "../schemas/TmdbCacheRecommendation";
 import TmdbCacheVideo from "../schemas/TmdbCacheVideo";
 import TmdbCacheImage from "../schemas/TmdbCacheImage";
 
+import { ERRORS_DEFAULT_3, ERRORS_SEARCH_10, ERRORS_SEARCH_11 } from "../langs/errors";
+
 interface SearchResponseInterface {
   tv?: {
     page: number;
@@ -56,7 +58,7 @@ class ResourceController {
           }
 
         } else {
-          //@TODO Tratar erro
+          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
 
           consultInApi = true;
         }
@@ -87,16 +89,15 @@ class ResourceController {
         responseData = findResource
       }
 
-      // console.log('RESULT DEVOLVIDO', responseData);
-
       return res.json(responseData);
     } catch (e) {
-      console.log('ERROR TRY CATCH', e);
-
-      return res.json({
-        error: true,
-        message: 'Not load resource'
-      })
+      return res
+        .status(ERRORS_DEFAULT_3.http)
+        .json({
+          error: false,
+          status_code: ERRORS_DEFAULT_3.code,
+          message: ERRORS_DEFAULT_3.http
+        });
     }
   }
 
@@ -118,7 +119,7 @@ class ResourceController {
           }
 
         } else {
-          //@TODO Tratar erro
+          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
 
           consultInApi = true;
         }
@@ -145,17 +146,15 @@ class ResourceController {
         responseData = findResource
       }
 
-      // console.log('RESULT DEVOLVIDO', responseData);
-
       return res.json(responseData);
     } catch (e) {
-      // console.log('ERROR TRY CATCH', e);
-      console.log('ERROR TRY CATCH', e.code);
-
-      return res.json({
-        error: true,
-        message: 'Not load resource'
-      })
+      return res
+        .status(ERRORS_DEFAULT_3.http)
+        .json({
+          error: false,
+          status_code: ERRORS_DEFAULT_3.code,
+          message: ERRORS_DEFAULT_3.http
+        });
     }
   }
 
@@ -177,7 +176,7 @@ class ResourceController {
           }
 
         } else {
-          //@TODO Tratar erro
+          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
 
           consultInApi = true;
         }
@@ -205,16 +204,15 @@ class ResourceController {
         responseData = findResource
       }
 
-      // console.log('RESULT DEVOLVIDO', responseData);
-
       return res.json(responseData);
     } catch (e) {
-      console.log('ERROR TRY CATCH', e);
-
-      return res.json({
-        error: true,
-        message: 'Not load resource'
-      })
+      return res
+        .status(ERRORS_DEFAULT_3.http)
+        .json({
+          error: false,
+          status_code: ERRORS_DEFAULT_3.code,
+          message: ERRORS_DEFAULT_3.http
+        });
     }
   }
 
@@ -236,7 +234,7 @@ class ResourceController {
           }
 
         } else {
-          //@TODO Tratar erro
+          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
 
           consultInApi = true;
         }
@@ -262,89 +260,97 @@ class ResourceController {
         responseData = findResource
       }
 
-      // console.log('RESULT DEVOLVIDO', responseData);
-
       return res.json(responseData);
     } catch (e) {
-      console.log('ERROR TRY CATCH', e);
-
-      return res.json({
-        error: true,
-        message: 'Not load resource'
-      })
+      return res
+        .status(ERRORS_DEFAULT_3.http)
+        .json({
+          error: false,
+          status_code: ERRORS_DEFAULT_3.code,
+          message: ERRORS_DEFAULT_3.http
+        });
     }
   }
 
   async search ( req: Request, res: Response ): Promise<Response> {
+    try {
+      let { query } = req.params,
+        consultApi = true,
+        responseData: SearchResponseInterface = {};
 
-    let { query } = req.params,
-      consultApi = true,
-      responseData: SearchResponseInterface = {};
-
-    if (typeof query === 'undefined' || !query) {
-      return res.status(400).json({
-        error: true,
-        message: 'Parameter search not found'
-      })
-    }
-
-    query = decodeURIComponent(query);
-
-    await SearchCache.findOne({
-      'query': query
-    }, function ( err, data ) {
-
-      if (data) {
-        responseData = data
-        consultApi = false
+      if (typeof query === 'undefined' || !query) {
+        return res.status(ERRORS_SEARCH_11.http)
+          .json({
+            error: true,
+            status_code: ERRORS_SEARCH_11.code,
+            message: ERRORS_SEARCH_11.message
+          })
       }
 
-    });
+      query = decodeURIComponent(query);
 
-    if (consultApi) {
-
-      const tmdb = new ShoowDb(process.env.TMDB_API_KEY);
-
-      await tmdb.searchMovie({
-        query
-      }).then(response => {
-        responseData = {
-          ...responseData,
-          'movie': response
-        };
+      await SearchCache.findOne({
+        'query': query
+      }, function ( err, data ) {
+        if (data) {
+          responseData = data
+          consultApi = false
+        }
       });
-      await tmdb.searchTv({
-        query
-      }).then(response => {
-        responseData = {
-          ...responseData,
-          'tv': response
-        };
-      });
+
+      if (consultApi) {
+
+        const tmdb = new ShoowDb(process.env.TMDB_API_KEY);
+
+        await tmdb.searchMovie({
+          query
+        }).then(response => {
+          responseData = {
+            ...responseData,
+            'movie': response
+          };
+        });
+        await tmdb.searchTv({
+          query
+        }).then(response => {
+          responseData = {
+            ...responseData,
+            'tv': response
+          };
+        });
+
+        if (!_.isEmpty(responseData)) {
+          SearchCache.create({
+            query,
+            results: responseData
+          })
+        }
+
+      }
 
       if (!_.isEmpty(responseData)) {
-        SearchCache.create({
-          query,
-          results: responseData
+        return res.json({
+          error: false,
+          status_code: ERRORS_SEARCH_10.code,
+          message: ERRORS_SEARCH_10.message,
+          payload: responseData
         })
       }
 
+      return res
+        .json({
+          error: false,
+          message: 'Data not found'
+        });
+    } catch (e) {
+      return res
+        .status(ERRORS_DEFAULT_3.http)
+        .json({
+          error: false,
+          status_code: ERRORS_DEFAULT_3.code,
+          message: ERRORS_DEFAULT_3.http
+        });
     }
-
-    if (!_.isEmpty(responseData)) {
-      return res.json({
-        error: false,
-        message: 'Search results',
-        results: responseData
-      })
-    }
-
-    return res
-      .status(404)
-      .json({
-        error: false,
-        message: 'data not found'
-      });
   }
 }
 
