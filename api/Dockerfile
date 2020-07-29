@@ -7,5 +7,5 @@ COPY ./mongo.js /api
 COPY ./.env /api
 COPY ./api /api
 
-EXPOSE 3000
-CMD node app.js
+#EXPOSE 3000
+#CMD node app.js

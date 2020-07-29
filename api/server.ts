@@ -1,12 +1,10 @@
-import express from 'express';
-import cors from 'cors';
+// @ts-ignore
 import dotenv from 'dotenv';
-
-dotenv.config();
+import express from 'express';
 
 import app from './app';
 
-app.use(cors());
+dotenv.config();
 
 app.use(express.json());
 

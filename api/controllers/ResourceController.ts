@@ -16,18 +16,14 @@ import TmdbCacheImage from "../schemas/TmdbCacheImage";
 import { ERRORS_DEFAULT_3, ERRORS_SEARCH_10, ERRORS_SEARCH_11 } from "../langs/errors";
 
 interface SearchResponseInterface {
-  tv?: {
+  results: {
+    type: string;
     page: number;
     total_results: number;
     total_pages: number;
     results: [];
-  },
-  movie?: {
-    page: number;
-    total_results: number;
-    total_pages: number;
-    results: [];
-  }
+  }[]
+  total_results: number;
 }
 
 class ResourceController {
@@ -276,7 +272,7 @@ class ResourceController {
     try {
       let { query } = req.params,
         consultApi = true,
-        responseData: SearchResponseInterface = {};
+        responseData: SearchResponseInterface;
 
       if (typeof query === 'undefined' || !query) {
         return res.status(ERRORS_SEARCH_11.http)
@@ -302,28 +298,48 @@ class ResourceController {
 
         const tmdb = new ShoowDb(process.env.TMDB_API_KEY);
 
+        let length = 0;
+        let arrayData = [];
+
         await tmdb.searchMovie({
           query
         }).then(response => {
-          responseData = {
-            ...responseData,
-            'movie': response
-          };
+
+          arrayData.push({
+            type: 'movie',
+            results: response.results
+          })
+
+          length += response.results.length
         });
+
         await tmdb.searchTv({
           query
         }).then(response => {
-          responseData = {
-            ...responseData,
-            'tv': response
-          };
+          // responseData = {
+          //   ...responseData,
+          //   'tv': response
+          // };
+
+          arrayData.push({
+            type: 'tv',
+            results: response.results
+          })
+
+          length += response.results.length
         });
 
-        if (!_.isEmpty(responseData)) {
+        if (!_.isEmpty(arrayData)) {
           SearchCache.create({
             query,
-            results: responseData
+            results: arrayData,
+            total_results: length
           })
+
+          responseData = {
+            results: arrayData,
+            total_results: length
+          }
         }
 
       }

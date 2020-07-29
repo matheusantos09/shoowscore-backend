@@ -1,13 +1,15 @@
 import { Document, model, Schema } from 'mongoose'
 
 interface SearchCacheInterface extends Document {
-  query: string,
-  results: object,
+  query: string;
+  results: object;
+  total_results: number;
 }
 
 const SearchCacheSchema = new Schema({
   query: String,
   results: Object,
+  total_results: Number,
   expiresAt: {
     type: Date,
     default: Date.now,
