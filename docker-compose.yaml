@@ -2,19 +2,19 @@ version: '3'
 
 services:
 
-#  api:
-#    container_name: api
-#    image: api
-#    build:
-#      context: ./
-#      dockerfile: ./api/Dockerfile
-#    restart: always
-#    ports:
-#      - "3000:3000"
-#    networks:
-#      - shoowscore
-#    links:
-#      - "mongo"
+  #  api:
+  #    container_name: api
+  #    image: api
+  #    build:
+  #      context: ./
+  #      dockerfile: ./api/Dockerfile
+  #    restart: always
+  #    ports:
+  #      - "3000:3000"
+  #    networks:
+  #      - shoowscore
+  #    links:
+  #      - "mongo"
 
   mongo:
     container_name: mongo
@@ -27,20 +27,20 @@ services:
     networks:
       - shoowscore
 
-  nginx:
-    container_name: nginx
-    image: nginx:1.19.1
-    build:
-      context: ./
-      dockerfile: ./nginx/Dockerfile
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-#    depends_on:
-#      - api
-    networks:
-      - shoowscore
+#  nginx:
+#    container_name: nginx
+#    image: nginx:1.19.1
+#    build:
+#      context: ./
+#      dockerfile: ./nginx/Dockerfile
+#    restart: always
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#        depends_on:
+#          - api
+#    networks:
+#      - shoowscore
 
 networks:
   shoowscore:
