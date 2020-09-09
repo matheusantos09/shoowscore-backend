@@ -6,6 +6,8 @@ import { TYPES as TMDB_TYPES } from '../services/tmdb/types'
 
 import ResourceRepository from "../repositories/ResourceRepository";
 
+import LogController from "./LogController";
+
 import SearchCache from "../schemas/SearchCache";
 import TmdbCacheMovie from "../schemas/TmdbCacheMovie";
 import TmdbCacheTv from "../schemas/TmdbCacheTv";
@@ -48,33 +50,27 @@ class ResourceController {
       const findResource = await TMDBInterfaceConsult.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
 
         if (!err) {
-
           if (!data) {
             consultInApi = true;
           }
-
         } else {
-          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
-
           consultInApi = true;
         }
 
       });
 
       if (consultInApi) {
+        await LogController.api('Consulted api for the resource: SEARCH', 'FIND')
 
         await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }`).then(response => {
           responseData = response;
 
           if (response) {
-
             responseData = {
               ...response,
               typeResource: type,
             }
-
           }
-
         });
 
         if (responseData) {
@@ -87,6 +83,8 @@ class ResourceController {
 
       return res.json(responseData);
     } catch (e) {
+      await LogController.exception(ERRORS_DEFAULT_3.http, ERRORS_DEFAULT_3.code, ERRORS_DEFAULT_3.message, 'FIND')
+
       return res
         .status(ERRORS_DEFAULT_3.http)
         .json({
@@ -109,20 +107,18 @@ class ResourceController {
       const findResource = await TmdbCacheRecommendation.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
 
         if (!err) {
-
           if (!data) {
             consultInApi = true;
           }
-
         } else {
-          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
-
           consultInApi = true;
         }
 
       });
 
       if (consultInApi) {
+        await LogController.api('Consulted api for the resource: SEARCH', 'GET_RECOMMENDATIONS')
+
         await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/recommendations`).then(response => {
           if (response) {
             responseData = {
@@ -144,6 +140,8 @@ class ResourceController {
 
       return res.json(responseData);
     } catch (e) {
+      await LogController.exception(ERRORS_DEFAULT_3.http, ERRORS_DEFAULT_3.code, ERRORS_DEFAULT_3.message, 'GET_RECOMMENDATIONS')
+
       return res
         .status(ERRORS_DEFAULT_3.http)
         .json({
@@ -166,20 +164,17 @@ class ResourceController {
       const findResource = await TmdbCacheVideo.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
 
         if (!err) {
-
           if (!data) {
             consultInApi = true;
           }
-
         } else {
-          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
-
           consultInApi = true;
         }
 
       });
 
       if (consultInApi) {
+        await LogController.api('Consulted api for the resource: SEARCH', 'GET_VIDEOS')
 
         await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/videos`).then(response => {
           if (response) {
@@ -202,6 +197,8 @@ class ResourceController {
 
       return res.json(responseData);
     } catch (e) {
+      await LogController.exception(ERRORS_DEFAULT_3.http, ERRORS_DEFAULT_3.code, ERRORS_DEFAULT_3.message, 'GET_VIDEOS')
+
       return res
         .status(ERRORS_DEFAULT_3.http)
         .json({
@@ -224,20 +221,17 @@ class ResourceController {
       const findResource = await TmdbCacheImage.findOne({ 'id': resourceId, 'typeResource': type }, function ( err, data ) {
 
         if (!err) {
-
           if (!data) {
             consultInApi = true;
           }
-
         } else {
-          //@TODO Caso ocorra problema com o banco apenas será ignorado e será feito uma consulta na API
-
           consultInApi = true;
         }
 
       });
 
       if (consultInApi) {
+        await LogController.api('Consulted api for the resource: SEARCH', 'GET_IMAGES')
 
         await ( new ShoowDb(process.env.TMDB_API_KEY) ).get(`${ type }/${ resourceId }/images`).then(response => {
           responseData = {
@@ -258,6 +252,8 @@ class ResourceController {
 
       return res.json(responseData);
     } catch (e) {
+      await LogController.exception(ERRORS_DEFAULT_3.http, ERRORS_DEFAULT_3.code, ERRORS_DEFAULT_3.message, 'GET_IMAGES')
+
       return res
         .status(ERRORS_DEFAULT_3.http)
         .json({
@@ -295,11 +291,12 @@ class ResourceController {
       });
 
       if (consultApi) {
+        await LogController.api('Consulted api for the resource: SEARCH', 'SEARCH')
 
         const tmdb = new ShoowDb(process.env.TMDB_API_KEY);
 
-        let length = 0;
-        let arrayData = [];
+        let length = 0,
+          arrayData = [];
 
         await tmdb.searchMovie({
           query
@@ -316,10 +313,6 @@ class ResourceController {
         await tmdb.searchTv({
           query
         }).then(response => {
-          // responseData = {
-          //   ...responseData,
-          //   'tv': response
-          // };
 
           arrayData.push({
             type: 'tv',
@@ -353,18 +346,19 @@ class ResourceController {
         })
       }
 
-      return res
-        .json({
-          error: false,
-          message: 'Data not found'
-        });
+      return res.json({
+        error: false,
+        message: 'Data not found'
+      });
     } catch (e) {
+      await LogController.exception(ERRORS_DEFAULT_3.http, ERRORS_DEFAULT_3.code, ERRORS_DEFAULT_3.message, 'SEARCH')
+
       return res
         .status(ERRORS_DEFAULT_3.http)
         .json({
           error: false,
           status_code: ERRORS_DEFAULT_3.code,
-          message: ERRORS_DEFAULT_3.http
+          message: ERRORS_DEFAULT_3.message
         });
     }
   }
