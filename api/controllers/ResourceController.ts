@@ -334,7 +334,6 @@ class ResourceController {
             total_results: length
           }
         }
-
       }
 
       if (!_.isEmpty(responseData)) {
