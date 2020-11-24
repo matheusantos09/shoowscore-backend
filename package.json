@@ -12,10 +12,10 @@
     "url": "https://github.com/matheuseduardo09/shoowscore-backend.git"
   },
   "scripts": {
-    "dev": "nodemon api/server",
+    "dev": "nodemon src/server",
     "dev:debug": "nodemon --inspect src/server",
-    "start": "node api-dist/server.js",
-    "build": "sucrase ./api -d ./dist --transforms typescript,imports"
+    "start": "node dist/server.js",
+    "build": "sucrase ./src -d ./dist --transforms typescript,imports"
   },
   "dependencies": {
     "@types/node": "^14.14.9",
@@ -38,6 +38,7 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
+    "eslint-import-resolver-typescript": "^2.3.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.4",
