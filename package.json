@@ -18,7 +18,7 @@
     "build": "sucrase ./src -d ./dist --transforms typescript,imports"
   },
   "dependencies": {
-    "@types/node": "^14.14.9",
+    "@types/node": "^14.14.16",
     "axios": "^0.20.0",
     "bluefeather": "^2.9.0",
     "cors": "^2.8.5",
