@@ -19,6 +19,7 @@ import {
   ERRORS_DEFAULT_3,
   ERRORS_SEARCH_10,
   ERRORS_SEARCH_11,
+  RESOURCE_LOAD_DEFAULT_1,
 } from '../langs/errors';
 
 interface SearchResponseInterface {
@@ -60,13 +61,13 @@ class ResourceController {
           } else {
             consultInApi = true;
           }
-        }
+        },
       );
 
       if (consultInApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
-          'FIND'
+          'FIND',
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
@@ -89,13 +90,18 @@ class ResourceController {
         responseData = findResource;
       }
 
-      return res.json(responseData);
+      return res.json({
+        error: false,
+        status_code: RESOURCE_LOAD_DEFAULT_1.code,
+        message: RESOURCE_LOAD_DEFAULT_1.message,
+        payload: responseData,
+      });
     } catch (e) {
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
-        'FIND'
+        'FIND',
       );
 
       return res.status(ERRORS_DEFAULT_3.http).json({
@@ -125,13 +131,13 @@ class ResourceController {
           } else {
             consultInApi = true;
           }
-        }
+        },
       );
 
       if (consultInApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
-          'GET_RECOMMENDATIONS'
+          'GET_RECOMMENDATIONS',
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
@@ -160,7 +166,7 @@ class ResourceController {
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
-        'GET_RECOMMENDATIONS'
+        'GET_RECOMMENDATIONS',
       );
 
       return res.status(ERRORS_DEFAULT_3.http).json({
@@ -190,13 +196,13 @@ class ResourceController {
           } else {
             consultInApi = true;
           }
-        }
+        },
       );
 
       if (consultInApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
-          'GET_VIDEOS'
+          'GET_VIDEOS',
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
@@ -225,7 +231,7 @@ class ResourceController {
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
-        'GET_VIDEOS'
+        'GET_VIDEOS',
       );
 
       return res.status(ERRORS_DEFAULT_3.http).json({
@@ -255,13 +261,13 @@ class ResourceController {
           } else {
             consultInApi = true;
           }
-        }
+        },
       );
 
       if (consultInApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
-          'GET_IMAGES'
+          'GET_IMAGES',
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
@@ -288,7 +294,7 @@ class ResourceController {
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
-        'GET_IMAGES'
+        'GET_IMAGES',
       );
 
       return res.status(ERRORS_DEFAULT_3.http).json({
@@ -324,13 +330,13 @@ class ResourceController {
             responseData = data;
             consultApi = false;
           }
-        }
+        },
       );
 
       if (consultApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
-          'SEARCH'
+          'SEARCH',
         );
 
         const tmdb = new ShoowDb(process.env.TMDB_API_KEY);
@@ -397,7 +403,7 @@ class ResourceController {
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
-        'SEARCH'
+        'SEARCH',
       );
 
       return res.status(ERRORS_DEFAULT_3.http).json({

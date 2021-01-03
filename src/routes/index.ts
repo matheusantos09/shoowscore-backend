@@ -14,7 +14,7 @@ routes.get('/api/search/:query', ResourceController.search);
 routes.get('/api/:type/:resourceId', ResourceController.find);
 routes.get(
   '/api/:type/:resourceId/recommendations',
-  ResourceController.getRecommendations
+  ResourceController.getRecommendations,
 );
 routes.get('/api/:type/:resourceId/videos', ResourceController.getVideos);
 routes.get('/api/:type/:resourceId/images', ResourceController.getImages);

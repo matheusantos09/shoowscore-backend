@@ -27,13 +27,13 @@ interface ErrorsInterface {
   message: string;
 }
 
-export const ERRORS_DEFAULT_1: ErrorsInterface = {
+export const RESOURCE_LOAD_DEFAULT_1: ErrorsInterface = {
   code: 1,
   http: 200,
   message: 'Resource Loaded',
 };
 
-export const ERRORS_DEFAULT_2: ErrorsInterface = {
+export const RESOURCE_ERRORS_DEFAULT_2: ErrorsInterface = {
   code: 2,
   http: 401,
   message: 'No provider key',
