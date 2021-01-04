@@ -11,3 +11,7 @@ export const thumbSize = {
 export const basePathTmdb = {
   image: 'https://image.tmdb.org/t/p/',
 };
+
+export const defaultConfigs = {
+  language: 'en-US',
+};

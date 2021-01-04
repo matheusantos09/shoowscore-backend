@@ -5,7 +5,7 @@ import NotFoundController from '../controllers/NotFoundController';
 
 const routes = new Router();
 
-routes.get('/api', function (req, res) {
+routes.get('/api', (req, res) => {
   res.send('Oque está procurando aqui parece que já sei foi...');
 });
 

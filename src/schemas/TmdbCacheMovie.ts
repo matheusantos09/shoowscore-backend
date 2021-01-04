@@ -85,11 +85,11 @@ const TmdbCacheMovieSchema = new Schema({
 
 TmdbCacheMovieSchema.index(
   { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_MOVIES) }
+  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_MOVIES) },
 );
 
 export default model<TmdbCacheMovieInterface>(
   'TmdbCacheMovie',
   TmdbCacheMovieSchema,
-  'tmdb_cache_resources'
+  'tmdb_cache_resources',
 );

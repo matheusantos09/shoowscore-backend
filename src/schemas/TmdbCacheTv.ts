@@ -148,11 +148,11 @@ const TmdbCacheTvSchema = new Schema({
 
 TmdbCacheTvSchema.index(
   { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_TV) }
+  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_TV) },
 );
 
 export default model<TmdbCacheTvInterface>(
   'TmdbCacheTv',
   TmdbCacheTvSchema,
-  'tmdb_cache_resources'
+  'tmdb_cache_resources',
 );

@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import { ShoowDb } from '../services/tmdb';
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types';
+import { defaultConfigs } from '../services/tmdb/constants';
 
 import ResourceRepository from '../repositories/ResourceRepository';
 
@@ -37,6 +38,11 @@ class ResourceController {
   async find(req: Request, res: Response): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
+      let { language } = req.query;
+
+      if (!language) {
+        language = defaultConfigs.language;
+      }
 
       await ResourceRepository.defaultValidations(resourceId, type);
 
@@ -52,7 +58,7 @@ class ResourceController {
       }
 
       const findResource = await TMDBInterfaceConsult.findOne(
-        { id: resourceId, typeResource: type },
+        { id: resourceId, typeResource: type, language },
         (err, data) => {
           if (!err) {
             if (!data) {
@@ -71,7 +77,7 @@ class ResourceController {
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
-          .get(`${type}/${resourceId}`)
+          .get(`${type}/${resourceId}?language=${language}`)
           .then((response) => {
             responseData = response;
 
@@ -79,6 +85,7 @@ class ResourceController {
               responseData = {
                 ...response,
                 typeResource: type,
+                language,
               };
             }
           });
@@ -115,15 +122,20 @@ class ResourceController {
   async getRecommendations(req: Request, res: Response): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
+      let { language } = req.query;
+
+      if (!language) {
+        language = defaultConfigs.language;
+      }
 
       await ResourceRepository.getRecommendationsValidations(resourceId, type);
 
-      let responseData,
-        consultInApi = false;
+      let responseData;
+      let consultInApi = false;
 
       const findResource = await TmdbCacheRecommendation.findOne(
-        { id: resourceId, typeResource: type },
-        function (err, data) {
+        { id: resourceId, typeResource: type, language },
+        (err, data) => {
           if (!err) {
             if (!data) {
               consultInApi = true;
@@ -141,13 +153,14 @@ class ResourceController {
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
-          .get(`${type}/${resourceId}/recommendations`)
+          .get(`${type}/${resourceId}/recommendations?language=${language}`)
           .then((response) => {
             if (response) {
               responseData = {
                 ...responseData,
                 id: resourceId,
                 typeResource: type,
+                language,
                 recommendations: response,
               };
             }
@@ -180,15 +193,20 @@ class ResourceController {
   async getVideos(req: Request, res: Response): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
+      let { language } = req.query;
+
+      if (!language) {
+        language = defaultConfigs.language;
+      }
 
       await ResourceRepository.defaultValidations(resourceId, type);
 
-      let responseData,
-        consultInApi = false;
+      let responseData;
+      let consultInApi = false;
 
       const findResource = await TmdbCacheVideo.findOne(
-        { id: resourceId, typeResource: type },
-        function (err, data) {
+        { id: resourceId, typeResource: type, language },
+        (err, data) => {
           if (!err) {
             if (!data) {
               consultInApi = true;
@@ -206,13 +224,14 @@ class ResourceController {
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
-          .get(`${type}/${resourceId}/videos`)
+          .get(`${type}/${resourceId}/videos?language=${language}`)
           .then((response) => {
             if (response) {
               responseData = {
                 ...responseData,
                 id: resourceId,
                 typeResource: type,
+                language,
                 videos: response,
               };
             }
@@ -245,15 +264,20 @@ class ResourceController {
   async getImages(req: Request, res: Response): Promise<Response> {
     try {
       const { resourceId, type } = req.params;
+      let { language } = req.query;
+
+      if (!language) {
+        language = defaultConfigs.language;
+      }
 
       await ResourceRepository.defaultValidations(resourceId, type);
 
-      let responseData,
-        consultInApi = false;
+      let responseData;
+      let consultInApi = false;
 
       const findResource = await TmdbCacheImage.findOne(
-        { id: resourceId, typeResource: type },
-        function (err, data) {
+        { id: resourceId, typeResource: type, language },
+        (err, data) => {
           if (!err) {
             if (!data) {
               consultInApi = true;
@@ -271,12 +295,13 @@ class ResourceController {
         );
 
         await new ShoowDb(process.env.TMDB_API_KEY)
-          .get(`${type}/${resourceId}/images`)
+          .get(`${type}/${resourceId}/images?language=${language}`)
           .then((response) => {
             responseData = {
               ...responseData,
               id: resourceId,
               typeResource: type,
+              language,
               images: response,
             };
           });
@@ -308,8 +333,13 @@ class ResourceController {
   async search(req: Request, res: Response): Promise<Response> {
     try {
       let { query } = req.params;
+      let { language } = req.query;
       let consultApi = true;
       let responseData: SearchResponseInterface;
+
+      if (!language) {
+        language = defaultConfigs.language;
+      }
 
       if (typeof query === 'undefined' || !query) {
         return res.status(ERRORS_SEARCH_11.http).json({
@@ -324,6 +354,7 @@ class ResourceController {
       await SearchCache.findOne(
         {
           query,
+          language,
         },
         (err, data) => {
           if (data) {
@@ -346,6 +377,7 @@ class ResourceController {
         await tmdb
           .searchMovie({
             query,
+            language,
           })
           .then((response) => {
             arrayData.push({
@@ -359,6 +391,7 @@ class ResourceController {
         await tmdb
           .searchTv({
             query,
+            language,
           })
           .then((response) => {
             arrayData.push({
@@ -372,6 +405,7 @@ class ResourceController {
         if (!_.isEmpty(arrayData)) {
           SearchCache.create({
             query,
+            language,
             results: arrayData,
             total_results: length,
           });
@@ -397,8 +431,6 @@ class ResourceController {
         message: 'Data not found',
       });
     } catch (e) {
-      console.log(e);
-
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,

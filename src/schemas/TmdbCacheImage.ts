@@ -2,11 +2,13 @@ import { Document, model, Schema } from 'mongoose';
 
 interface TmdbCacheImageInterface extends Document {
   id?: number;
+  language: string;
   images?: [];
 }
 
 const TmdbCacheImageSchema = new Schema({
   id: Number,
+  language: String,
   images: Array,
   expiresAt: {
     type: Date,
@@ -17,11 +19,11 @@ const TmdbCacheImageSchema = new Schema({
 
 TmdbCacheImageSchema.index(
   { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_IMAGES) }
+  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_IMAGES) },
 );
 
 export default model<TmdbCacheImageInterface>(
   'TmdbCacheImage',
   TmdbCacheImageSchema,
-  'tmdb_cache_images'
+  'tmdb_cache_images',
 );

@@ -2,6 +2,7 @@ import { Document, model, Schema } from 'mongoose';
 
 interface LogExceptionsAndErrorsInterface extends Document {
   query: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   results: object;
   total_results: number;
 }
@@ -20,5 +21,5 @@ const LogExceptionsAndErrorsSchema = new Schema({
 export default model<LogExceptionsAndErrorsInterface>(
   'LogExceptionsAndErrors',
   LogExceptionsAndErrorsSchema,
-  'logs_exceptions'
+  'logs_exceptions',
 );
