@@ -1,6 +1,7 @@
 import { Document, model, Schema } from 'mongoose';
 
 interface TmdbCacheTvInterface extends Document {
+  language: string;
   backdrop_path?: string;
   created_by?: [];
   episode_run_time?: [];
@@ -107,6 +108,7 @@ interface TmdbCacheTvInterface extends Document {
 }
 
 const TmdbCacheTvSchema = new Schema({
+  language: String,
   backdrop_path: String,
   created_by: Array,
   episode_run_time: Array,
@@ -154,5 +156,5 @@ TmdbCacheTvSchema.index(
 export default model<TmdbCacheTvInterface>(
   'TmdbCacheTv',
   TmdbCacheTvSchema,
-  'tmdb_cache_resources',
+  'tmdb_cache_tv',
 );

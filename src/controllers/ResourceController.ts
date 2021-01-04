@@ -70,6 +70,8 @@ class ResourceController {
         },
       );
 
+      console.log('Não Encontrou no banco', consultInApi);
+
       if (consultInApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
@@ -104,6 +106,9 @@ class ResourceController {
         payload: responseData,
       });
     } catch (e) {
+      console.log('ERORR CATCH');
+      console.log(e);
+
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,

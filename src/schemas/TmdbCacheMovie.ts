@@ -1,9 +1,11 @@
 import { Document, model, Schema } from 'mongoose';
 
 interface TmdbCacheMovieInterface extends Document {
+  language: string;
   adult: boolean;
   backdrop_path: string;
-  belongs_to_collection: boolean;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  belongs_to_collection: null | {};
   budget: number;
   genres: {
     id: number;
@@ -47,9 +49,16 @@ interface TmdbCacheMovieInterface extends Document {
 }
 
 const TmdbCacheMovieSchema = new Schema({
+  language: String,
   adult: Boolean,
   backdrop_path: String,
-  belongs_to_collection: Boolean,
+  belongs_to_collection: {
+    type: {
+      preference1: Object,
+      preference2: null,
+    },
+    default: null,
+  },
   budget: Number,
   genres: Array,
   homepage: String,
@@ -91,5 +100,5 @@ TmdbCacheMovieSchema.index(
 export default model<TmdbCacheMovieInterface>(
   'TmdbCacheMovie',
   TmdbCacheMovieSchema,
-  'tmdb_cache_resources',
+  'tmdb_cache_movie',
 );
