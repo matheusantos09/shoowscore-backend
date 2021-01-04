@@ -70,8 +70,6 @@ class ResourceController {
         },
       );
 
-      console.log('Não Encontrou no banco', consultInApi);
-
       if (consultInApi) {
         await LogController.api(
           'Consulted api for the resource: SEARCH',
@@ -106,8 +104,12 @@ class ResourceController {
         payload: responseData,
       });
     } catch (e) {
-      console.log('ERORR CATCH');
-      console.log(e);
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
+        e.message,
+        'FIND | CATCH ERROR',
+      );
 
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
@@ -183,6 +185,13 @@ class ResourceController {
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
+        e.message,
+        'GET_RECOMMENDATIONS | CATCH ERROR',
+      );
+
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
         'GET_RECOMMENDATIONS',
       );
@@ -254,6 +263,13 @@ class ResourceController {
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
+        e.message,
+        'GET_VIDEOS | CATCH ERROR',
+      );
+
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
         ERRORS_DEFAULT_3.message,
         'GET_VIDEOS',
       );
@@ -320,6 +336,13 @@ class ResourceController {
 
       return res.json(responseData);
     } catch (e) {
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
+        e.message,
+        'GET_IMAGES | CATCH ERROR',
+      );
+
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
@@ -436,6 +459,13 @@ class ResourceController {
         message: 'Data not found',
       });
     } catch (e) {
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
+        e.message,
+        'SEARCH | CATCH ERROR',
+      );
+
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,

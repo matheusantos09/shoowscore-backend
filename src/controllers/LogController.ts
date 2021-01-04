@@ -3,7 +3,7 @@ import LogExceptionsAndErrors from '../schemas/LogExceptionsAndErrors';
 
 class LogController {
   async api(message: string, resource: string) {
-    LogConsults.create({
+    await LogConsults.create({
       message,
       resource,
     });
@@ -13,9 +13,9 @@ class LogController {
     status_code: number,
     app_code: number,
     message: string,
-    resource: string
+    resource: string,
   ) {
-    LogExceptionsAndErrors.create({
+    await LogExceptionsAndErrors.create({
       status_code,
       app_code,
       message,
