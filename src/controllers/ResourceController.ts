@@ -88,10 +88,6 @@ class ResourceController {
         await new ShoowDb(process.env.TMDB_API_KEY)
           .get(`${type}/${resourceId}?${queryParams}`)
           .then((response) => {
-            // console.log('---------------------------------------');
-            // console.log(response);
-            // console.log('---------------------------------------');
-
             responseData = response;
 
             if (response) {
