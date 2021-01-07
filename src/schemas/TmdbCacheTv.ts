@@ -26,7 +26,6 @@ interface TmdbCacheTvInterface extends Document {
     vote_count?: number;
   };
   name?: string;
-  // next_episode_to_air?: boolean | [] | {} | string,
   next_episode_to_air?: any;
   networks?: {
     name: string;
@@ -102,9 +101,10 @@ interface TmdbCacheTvInterface extends Document {
   vote_average?: number;
   vote_count?: number;
   typeResource?: string;
-  videos?: [];
-  images?: [];
-  recommendations?: [];
+  videos?: Record<string, never>;
+  images?: Record<string, never>;
+  recommendations?: Record<string, never>;
+  credits?: Record<string, never>;
 }
 
 const TmdbCacheTvSchema = new Schema({
@@ -138,9 +138,10 @@ const TmdbCacheTvSchema = new Schema({
   vote_average: Number,
   vote_count: Number,
   typeResource: String,
-  videos: Array,
-  images: Array,
-  recommendations: Array,
+  videos: Object,
+  images: Object,
+  recommendations: Object,
+  credits: Object,
   expiresAt: {
     type: Date,
     default: Date.now,

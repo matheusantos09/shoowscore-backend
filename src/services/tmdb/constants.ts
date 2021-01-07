@@ -15,3 +15,10 @@ export const basePathTmdb = {
 export const defaultConfigs = {
   language: 'en-US',
 };
+
+export const appendToResponse = [
+  'credits',
+  'videos',
+  'images',
+  'recommendations',
+];

@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { ShoowDb } from '../services/tmdb';
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types';
-import { defaultConfigs } from '../services/tmdb/constants';
+import { appendToResponse, defaultConfigs } from '../services/tmdb/constants';
 
 import ResourceRepository from '../repositories/ResourceRepository';
 
@@ -57,18 +57,22 @@ class ResourceController {
         TMDBInterfaceConsult = TmdbCacheTv;
       }
 
-      const findResource = await TMDBInterfaceConsult.findOne(
-        { id: resourceId, typeResource: type, language },
-        (err, data) => {
-          if (!err) {
-            if (!data) {
-              consultInApi = true;
-            }
-          } else {
-            consultInApi = true;
+      const findResource = await TMDBInterfaceConsult.findOne({
+        id: resourceId,
+        typeResource: type,
+        language,
+      })
+        // eslint-disable-next-line consistent-return
+        .then((data) => {
+          if (data) {
+            return data;
           }
-        },
-      );
+
+          consultInApi = true;
+        })
+        .catch(() => {
+          consultInApi = true;
+        });
 
       if (consultInApi) {
         await LogController.api(
@@ -76,9 +80,18 @@ class ResourceController {
           'FIND',
         );
 
+        const queryParams = new URLSearchParams({
+          language,
+          append_to_response: appendToResponse.join(','),
+        });
+
         await new ShoowDb(process.env.TMDB_API_KEY)
-          .get(`${type}/${resourceId}?language=${language}`)
+          .get(`${type}/${resourceId}?${queryParams}`)
           .then((response) => {
+            // console.log('---------------------------------------');
+            // console.log(response);
+            // console.log('---------------------------------------');
+
             responseData = response;
 
             if (response) {
@@ -431,7 +444,7 @@ class ResourceController {
           });
 
         if (!_.isEmpty(arrayData)) {
-          SearchCache.create({
+          await SearchCache.create({
             query,
             language,
             results: arrayData,

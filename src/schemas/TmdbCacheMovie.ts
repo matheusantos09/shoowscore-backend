@@ -4,8 +4,7 @@ interface TmdbCacheMovieInterface extends Document {
   language: string;
   adult: boolean;
   backdrop_path: string;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  belongs_to_collection: null | {};
+  belongs_to_collection: null | Record<string, never>;
   budget: number;
   genres: {
     id: number;
@@ -32,10 +31,6 @@ interface TmdbCacheMovieInterface extends Document {
   release_date: string;
   revenue: number;
   runtime: number;
-  spoken_languages: {
-    iso_639_1: string;
-    name: string;
-  }[];
   status: string;
   tagline: string;
   title: string;
@@ -43,9 +38,10 @@ interface TmdbCacheMovieInterface extends Document {
   vote_average: number;
   vote_count: number;
   typeResource?: string;
-  videos?: [];
-  images?: [];
-  recommendations?: [];
+  videos?: Record<string, never>;
+  images?: Record<string, never>;
+  recommendations?: Record<string, never>;
+  credits?: Record<string, never>;
 }
 
 const TmdbCacheMovieSchema = new Schema({
@@ -74,7 +70,6 @@ const TmdbCacheMovieSchema = new Schema({
   release_date: String,
   revenue: Number,
   runtime: Number,
-  spoken_languages: Array,
   status: String,
   tagline: String,
   title: String,
@@ -82,9 +77,10 @@ const TmdbCacheMovieSchema = new Schema({
   vote_average: Number,
   vote_count: Number,
   typeResource: String,
-  videos: Array,
-  images: Array,
-  recommendations: Array,
+  videos: Object,
+  images: Object,
+  recommendations: Object,
+  credits: Object,
   expiresAt: {
     type: Date,
     default: Date.now,
