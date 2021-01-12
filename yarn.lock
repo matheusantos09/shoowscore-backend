@@ -2336,10 +2336,10 @@ rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
-roarr@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/roarr/-/roarr-3.3.0.tgz#e04898efa2d778e42f3e68c0b5ab0f8b7f636c34"
-  integrity sha512-9kZ+t1lba/ENPpC8euUg7oPkUJ1M8SeoYYmkO2lvkH61EaVLRI/Apm2+HIe/Fvza5EpNye9s8JfYhlPNlLHyUw==
+roarr@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/roarr/-/roarr-4.0.0.tgz#8ca13cd3fc67845f5edcb1bb2e48a9a9a2de8fed"
+  integrity sha512-RKqIldSN4n9fK7iO0Iv7tRAV/R75WxABTXJ6ufWWhCssIpSoEwtQTwg2SEwuVefXqx1GYdt38zovzHV8vmyeqw==
   dependencies:
     approximate-now "^1.0.0"
     boolean "^3.0.2"
