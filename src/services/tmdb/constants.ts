@@ -16,9 +16,18 @@ export const defaultConfigs = {
   language: 'en-US',
 };
 
-export const appendToResponse = [
+export const appendToResponseMovie = [
   'credits',
   'videos',
   'images',
   'recommendations',
+];
+
+export const appendToResponseTvShow = [
+  'credits',
+  'videos',
+  'images',
+  'recommendations',
+  'seasons',
+  'episodes',
 ];

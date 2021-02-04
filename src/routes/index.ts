@@ -8,16 +8,23 @@ const routes = new Router();
 routes.get('/api', (req, res) => {
   res.send('Oque está procurando aqui parece que já sei foi...');
 });
+routes.get('/api/v1', (req, res) => {
+  res.send('Oque está procurando aqui parece que já sei foi...');
+});
 
-routes.get('/api/search/:query', ResourceController.search);
+routes.get('/api/v1/search/:query', ResourceController.search);
 
-routes.get('/api/:type/:resourceId', ResourceController.find);
+routes.get('/api/v1/:type/:resourceId', ResourceController.find);
 routes.get(
-  '/api/:type/:resourceId/recommendations',
+  '/api/v1/:type/:resourceId/recommendations',
   ResourceController.getRecommendations,
 );
-routes.get('/api/:type/:resourceId/videos', ResourceController.getVideos);
-routes.get('/api/:type/:resourceId/images', ResourceController.getImages);
+routes.get('/api/v1/:type/:resourceId/videos', ResourceController.getVideos);
+routes.get('/api/v1/:type/:resourceId/images', ResourceController.getImages);
+routes.get(
+  '/api/v1/:type/:resourceId/seasons/:seasonNumber',
+  ResourceController.getSeasons,
+);
 
 routes.get('*', NotFoundController.notFound);
 

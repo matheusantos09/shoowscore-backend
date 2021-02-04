@@ -1,4 +1,5 @@
 import express from 'express';
+// @ts-ignore
 import mongoose from 'mongoose';
 // @ts-ignore
 import dotenv from 'dotenv';
@@ -31,7 +32,7 @@ class App {
     this.server.use(routes);
   }
 
-  /*apiKeyVerify () {
+  /* apiKeyVerify () {
     app.use(function ( req, res, next ) {
       const key = req.headers['x-api-key'];
       if (key && key === process.env.API_KEY) {
@@ -39,7 +40,7 @@ class App {
       }
       res.send('Invalid API key supplied');
     });
-  }*/
+  } */
 
   database() {
     // mongoose.connect(`mongodb://${ process.env.MONGO_DBHOST }:${ process.env.MONGO_DBPORT }/${ process.env.MONGO_DBNANE }`, {
@@ -50,7 +51,7 @@ class App {
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-      }
+      },
     );
   }
 }

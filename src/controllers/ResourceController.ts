@@ -3,7 +3,11 @@ import _ from 'lodash';
 
 import { ShoowDb } from '../services/tmdb';
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types';
-import { appendToResponse, defaultConfigs } from '../services/tmdb/constants';
+import {
+  appendToResponseMovie,
+  appendToResponseTvShow,
+  defaultConfigs,
+} from '../services/tmdb/constants';
 
 import ResourceRepository from '../repositories/ResourceRepository';
 
@@ -15,6 +19,7 @@ import TmdbCacheTv from '../schemas/TmdbCacheTv';
 import TmdbCacheRecommendation from '../schemas/TmdbCacheRecommendation';
 import TmdbCacheVideo from '../schemas/TmdbCacheVideo';
 import TmdbCacheImage from '../schemas/TmdbCacheImage';
+import TmdbCacheTvEpisodes from '../schemas/TmdbCacheTvEpisodes';
 
 import {
   ERRORS_DEFAULT_3,
@@ -49,12 +54,16 @@ class ResourceController {
       let responseData;
       let consultInApi = false;
       let TMDBInterfaceConsult;
+      let appendToResponse;
 
       if (TMDB_TYPES.movie === type) {
         TMDBInterfaceConsult = TmdbCacheMovie;
+        appendToResponse = appendToResponseMovie;
       }
+
       if (TMDB_TYPES.tv === type) {
         TMDBInterfaceConsult = TmdbCacheTv;
+        appendToResponse = appendToResponseTvShow;
       }
 
       const findResource = await TMDBInterfaceConsult.findOne({
@@ -486,6 +495,109 @@ class ResourceController {
         error: false,
         status_code: ERRORS_DEFAULT_3.code,
         message: ERRORS_DEFAULT_3.message,
+      });
+    }
+  }
+
+  async getSeasons(req: Request, res: Response): Promise<Response> {
+    try {
+      const { resourceId, type, seasonNumber } = req.params;
+      let { language } = req.query;
+
+      if (!language) {
+        language = defaultConfigs.language;
+      }
+
+      await ResourceRepository.getTvEpisodesValidation(
+        resourceId,
+        type,
+        seasonNumber,
+      );
+
+      let responseData;
+      let payloadOld = {};
+      let consultInApi = false;
+
+      const findResource = await TmdbCacheTvEpisodes.findOne(
+        { id: resourceId, typeResource: type, language },
+        (err, data) => {
+          if (!err) {
+            if (!data) {
+              consultInApi = true;
+            } else if (
+              data &&
+              data.payload &&
+              !Object.keys(data.payload).includes(seasonNumber)
+            ) {
+              payloadOld = data.payload;
+
+              consultInApi = true;
+            } else {
+              payloadOld = data.payload;
+            }
+          } else {
+            consultInApi = true;
+          }
+        },
+      );
+
+      if (consultInApi) {
+        await LogController.api(
+          'Consulted api for the resource: SEARCH',
+          'GET_SEASONS',
+        );
+
+        await new ShoowDb(process.env.TMDB_API_KEY)
+          .get(
+            `${type}/${resourceId}/season/${seasonNumber}?language=${language}`,
+          )
+          .then((response) => {
+            responseData = {
+              id: resourceId,
+              typeResource: type,
+              language,
+              payload: {
+                ...payloadOld,
+              },
+            };
+
+            responseData.payload[seasonNumber] = response;
+          });
+
+        await TmdbCacheTvEpisodes.findOneAndUpdate(
+          { id: resourceId, typeResource: type, language },
+          responseData,
+          {
+            new: true,
+            upsert: true,
+          },
+        );
+      } else {
+        responseData = findResource;
+      }
+
+      return res.json(responseData);
+    } catch (e) {
+      console.log(e);
+
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
+        e.message,
+        'GET_IMAGES | CATCH ERROR',
+      );
+
+      await LogController.exception(
+        ERRORS_DEFAULT_3.http,
+        ERRORS_DEFAULT_3.code,
+        ERRORS_DEFAULT_3.message,
+        'GET_IMAGES',
+      );
+
+      return res.status(ERRORS_DEFAULT_3.http).json({
+        error: false,
+        status_code: ERRORS_DEFAULT_3.code,
+        message: ERRORS_DEFAULT_3.http,
       });
     }
   }
