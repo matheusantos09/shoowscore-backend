@@ -10,17 +10,18 @@ const TmdbCacheVideoSchema = new Schema({
   id: Number,
   language: String,
   videos: Array,
-  expiresAt: {
-    type: Date,
-    default: Date.now,
-    expires: 0,
-  },
+  // @TODO Set new time for expire register
+  // expiresAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   expires: 0,
+  // },
 });
 
-TmdbCacheVideoSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_VIDEOS) },
-);
+// TmdbCacheVideoSchema.index(
+//   { expiresAt: 1 },
+//   { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_VIDEOS) },
+// );
 
 export default model<TmdbCacheVideoInterface>(
   'TmdbCacheVideo',

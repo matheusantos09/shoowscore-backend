@@ -10,17 +10,18 @@ const TmdbCacheImageSchema = new Schema({
   id: Number,
   language: String,
   images: Array,
-  expiresAt: {
-    type: Date,
-    default: Date.now,
-    expires: 0,
-  },
+  // @TODO Set new time for expire register
+  // expiresAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   expires: 0,
+  // },
 });
 
-TmdbCacheImageSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_IMAGES) },
-);
+// TmdbCacheImageSchema.index(
+//   { expiresAt: 1 },
+//   { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_IMAGES) },
+// );
 
 export default model<TmdbCacheImageInterface>(
   'TmdbCacheImage',

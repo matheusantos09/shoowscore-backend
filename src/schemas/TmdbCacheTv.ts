@@ -142,17 +142,18 @@ const TmdbCacheTvSchema = new Schema({
   images: Object,
   recommendations: Object,
   credits: Object,
-  expiresAt: {
-    type: Date,
-    default: Date.now,
-    expires: 0,
-  },
+  // @TODO Set new time for expire register
+  // expiresAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   expires: 0,
+  // },
 });
 
-TmdbCacheTvSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_TV) },
-);
+// TmdbCacheTvSchema.index(
+//   { expiresAt: 1 },
+//   { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_TV) },
+// );
 
 export default model<TmdbCacheTvInterface>(
   'TmdbCacheTv',

@@ -81,17 +81,18 @@ const TmdbCacheMovieSchema = new Schema({
   images: Object,
   recommendations: Object,
   credits: Object,
-  expiresAt: {
-    type: Date,
-    default: Date.now,
-    expires: 0,
-  },
+  // @TODO Set new time for expire register
+  // expiresAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   expires: 0,
+  // },
 });
 
-TmdbCacheMovieSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_MOVIES) },
-);
+// TmdbCacheMovieSchema.index(
+//   { expiresAt: 1 },
+//   { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_MOVIES) },
+// );
 
 export default model<TmdbCacheMovieInterface>(
   'TmdbCacheMovie',

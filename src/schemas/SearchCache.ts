@@ -13,17 +13,19 @@ const SearchCacheSchema = new Schema({
   language: String,
   results: Object,
   total_results: Number,
-  expiresAt: {
-    type: Date,
-    default: Date.now,
-    expires: 0,
-  },
+  // @TODO Set new time for expire register
+  // expiresAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   expires: 0,
+  // },
 });
 
-SearchCacheSchema.index(
-  { expiresAt: 1 },
-  { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_SEARCH) },
-);
+// @TODO Set new time for expire register
+// SearchCacheSchema.index(
+//   { expiresAt: 1 },
+//   { expireAfterSeconds: Number(process.env.TMDB_CACHE_SECONDS_SEARCH) },
+// );
 
 export default model<SearchCacheInterface>(
   'SearchCache',
