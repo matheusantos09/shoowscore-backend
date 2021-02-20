@@ -22,7 +22,7 @@ routes.get(
 routes.get('/api/v1/:type/:resourceId/videos', ResourceController.getVideos);
 routes.get('/api/v1/:type/:resourceId/images', ResourceController.getImages);
 routes.get(
-  '/api/v1/:type/:resourceId/seasons/:seasonNumber',
+  '/api/v1/:type/:resourceId/seasons/:seasonNumberMax',
   ResourceController.getSeasons,
 );
 

@@ -21,14 +21,14 @@ class ResourceRepository {
     }
   }
 
-  async getTvEpisodesValidation(resourceId, type, seasonNumber) {
+  async getTvEpisodesValidation(resourceId, type, seasonNumberMax) {
     if (
       typeof resourceId === 'undefined' ||
       resourceId === '' ||
       typeof type === 'undefined' ||
       type === '' ||
-      typeof seasonNumber === 'undefined' ||
-      seasonNumber === ''
+      typeof seasonNumberMax === 'undefined' ||
+      seasonNumberMax === ''
     ) {
       // @TODO Melhorar o return das respostas de erro
       throw Error('Not found params required');
@@ -42,7 +42,7 @@ class ResourceRepository {
       throw Error('Resource ID not a number');
     }
 
-    if (Number.isNaN(seasonNumber)) {
+    if (Number.isNaN(seasonNumberMax)) {
       throw Error('Season Number not a number');
     }
   }

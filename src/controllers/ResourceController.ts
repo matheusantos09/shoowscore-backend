@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import _ from 'lodash';
+import _, { mapValues } from 'lodash';
 
 import { ShoowDb } from '../services/tmdb';
 import { TYPES as TMDB_TYPES } from '../services/tmdb/types';
@@ -19,7 +19,6 @@ import TmdbCacheTv from '../schemas/TmdbCacheTv';
 import TmdbCacheRecommendation from '../schemas/TmdbCacheRecommendation';
 import TmdbCacheVideo from '../schemas/TmdbCacheVideo';
 import TmdbCacheImage from '../schemas/TmdbCacheImage';
-import TmdbCacheTvEpisodes from '../schemas/TmdbCacheTvEpisodes';
 
 import {
   ERRORS_DEFAULT_3,
@@ -27,6 +26,7 @@ import {
   ERRORS_SEARCH_11,
   RESOURCE_LOAD_DEFAULT_1,
 } from '../langs/errors';
+import TmdbCacheTvEpisodes from '../schemas/TmdbCacheTvEpisodes';
 
 interface SearchResponseInterface {
   results: {
@@ -501,7 +501,7 @@ class ResourceController {
 
   async getSeasons(req: Request, res: Response): Promise<Response> {
     try {
-      const { resourceId, type, seasonNumber } = req.params;
+      const { resourceId, type, seasonNumberMax } = req.params;
       let { language } = req.query;
 
       if (!language) {
@@ -511,75 +511,102 @@ class ResourceController {
       await ResourceRepository.getTvEpisodesValidation(
         resourceId,
         type,
-        seasonNumber,
+        seasonNumberMax,
       );
 
       let responseData;
-      let payloadOld = {};
-      let consultInApi = false;
+      let responseDataPayload = {};
+      let tvEpisodesForSearchInApi = [];
 
-      const findResource = await TmdbCacheTvEpisodes.findOne(
+      responseData = await TmdbCacheTvEpisodes.findOne(
         { id: resourceId, typeResource: type, language },
         (err, data) => {
-          if (!err) {
-            if (!data) {
-              consultInApi = true;
-            } else if (
-              data &&
-              data.payload &&
-              !Object.keys(data.payload).includes(seasonNumber)
-            ) {
-              payloadOld = data.payload;
-
-              consultInApi = true;
-            } else {
-              payloadOld = data.payload;
-            }
-          } else {
-            consultInApi = true;
+          if (!err & data && data.payload) {
+            return data.payload;
           }
         },
       );
 
-      if (consultInApi) {
-        await LogController.api(
-          'Consulted api for the resource: SEARCH',
-          'GET_SEASONS',
+      for (let loopIndex = 0; loopIndex <= seasonNumberMax; loopIndex += 1) {
+        if (
+          responseData &&
+          !Object.keys(responseData.payload).includes(String(loopIndex))
+        ) {
+          tvEpisodesForSearchInApi.push(loopIndex);
+        } else if (!responseData) {
+          tvEpisodesForSearchInApi.push(loopIndex);
+        }
+      }
+
+      if (tvEpisodesForSearchInApi.length) {
+        responseDataPayload = await Promise.all(
+          tvEpisodesForSearchInApi.map(
+            async (seasonEpisodesMissing): Promise<any> => {
+              await LogController.api(
+                `Consulted api for the resource: SEARCH [${seasonEpisodesMissing}]`,
+                'GET_SEASONS',
+              );
+
+              let returnShowDBApi = '';
+
+              returnShowDBApi = await new ShoowDb(process.env.TMDB_API_KEY)
+                .get(
+                  `${type}/${resourceId}/season/${seasonEpisodesMissing}?language=${language}`,
+                )
+                .then((response) => response)
+                .catch((err) => {
+                  LogController.exception(
+                    ERRORS_DEFAULT_3.http,
+                    ERRORS_DEFAULT_3.code,
+                    `Season [${seasonEpisodesMissing}]: ${err.message}`,
+                    'GET_SEASON_EPISODES',
+                  );
+
+                  return null;
+                });
+
+              return returnShowDBApi;
+            },
+          ),
         );
 
-        await new ShoowDb(process.env.TMDB_API_KEY)
-          .get(
-            `${type}/${resourceId}/season/${seasonNumber}?language=${language}`,
-          )
-          .then((response) => {
-            responseData = {
-              id: resourceId,
-              typeResource: type,
-              language,
-              payload: {
-                ...payloadOld,
-              },
-            };
+        if (Object.keys(responseDataPayload).length) {
+          let valuesForEpisodes = {};
 
-            responseData.payload[seasonNumber] = response;
+          mapValues(responseDataPayload, (value, key) => {
+            if (value) {
+              valuesForEpisodes[value.season_number] = value;
+            }
           });
 
-        await TmdbCacheTvEpisodes.findOneAndUpdate(
-          { id: resourceId, typeResource: type, language },
-          responseData,
-          {
-            new: true,
-            upsert: true,
-          },
-        );
-      } else {
-        responseData = findResource;
+          if (responseData && responseData.payload) {
+            responseData.payload = {
+              ...responseData.payload,
+              ...valuesForEpisodes,
+            };
+          } else {
+            responseData = {};
+
+            responseData['payload'] = {
+              ...valuesForEpisodes,
+            };
+          }
+
+          await TmdbCacheTvEpisodes.findOneAndUpdate(
+            { id: resourceId, typeResource: type, language },
+            {
+              payload: responseData.payload,
+            },
+            {
+              new: true,
+              upsert: true,
+            },
+          );
+        }
       }
 
       return res.json(responseData);
     } catch (e) {
-      console.log(e);
-
       await LogController.exception(
         ERRORS_DEFAULT_3.http,
         ERRORS_DEFAULT_3.code,
