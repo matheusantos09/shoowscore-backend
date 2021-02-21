@@ -516,7 +516,7 @@ class ResourceController {
 
       let responseData;
       let responseDataPayload = {};
-      let tvEpisodesForSearchInApi = [];
+      const tvEpisodesForSearchInApi = [];
 
       responseData = await TmdbCacheTvEpisodes.findOne(
         { id: resourceId, typeResource: type, language },

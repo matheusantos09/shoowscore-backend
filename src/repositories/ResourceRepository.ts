@@ -16,7 +16,7 @@ class ResourceRepository {
       throw Error('Type send not allowed');
     }
 
-    if (Number.isNaN(resourceId)) {
+    if (!(!Number.isNaN(resourceId) && !Number.isNaN(parseFloat(resourceId)))) {
       throw Error('Resource ID not a number');
     }
   }
@@ -42,7 +42,12 @@ class ResourceRepository {
       throw Error('Resource ID not a number');
     }
 
-    if (Number.isNaN(seasonNumberMax)) {
+    if (
+      !(
+        !Number.isNaN(seasonNumberMax) &&
+        !Number.isNaN(parseFloat(seasonNumberMax))
+      )
+    ) {
       throw Error('Season Number not a number');
     }
   }
@@ -63,7 +68,7 @@ class ResourceRepository {
       throw Error('Type send not allowed');
     }
 
-    if (Number.isNaN(resourceId)) {
+    if (!(!Number.isNaN(resourceId) && !Number.isNaN(parseFloat(resourceId)))) {
       throw Error('Resource ID not a number');
     }
   }
