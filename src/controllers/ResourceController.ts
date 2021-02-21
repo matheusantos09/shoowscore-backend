@@ -624,7 +624,8 @@ class ResourceController {
       return res.status(ERRORS_DEFAULT_3.http).json({
         error: false,
         status_code: ERRORS_DEFAULT_3.code,
-        message: ERRORS_DEFAULT_3.http,
+        code: ERRORS_DEFAULT_3.http,
+        message: e.message,
       });
     }
   }
