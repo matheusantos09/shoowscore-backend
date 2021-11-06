@@ -6,3 +6,4 @@ frontend/*
 !frontend/default.html
 .idea
 .env
+.yarn/
